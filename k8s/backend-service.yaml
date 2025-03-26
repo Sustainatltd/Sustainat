@@ -1,0 +1,16 @@
+# -------------------------------
+# 🌐 Service for Backend (NodePort)
+# -------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: sustainat-backend-service
+  namespace: sustainat
+spec:
+  type: NodePort # 🔁 Makes it accessible outside the cluster (via Minikube)
+  selector:
+    app: sustainat-backend
+  ports:
+    - port: 5001          # 🎯 Cluster port
+      targetPort: 5001    # 🚪 Port inside the container
+      nodePort: 30001     # 🌍 External access via localhost:30001

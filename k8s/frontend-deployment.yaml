@@ -1,0 +1,43 @@
+# -------------------------------
+# 📦 Deployment for React Frontend
+# -------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sustainat-frontend
+  namespace: sustainat
+  labels:
+    app: sustainat-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sustainat-frontend
+  template:
+    metadata:
+      labels:
+        app: sustainat-frontend
+    spec:  # 👈 Fixed indentation starts here
+      containers:
+        - name: sustainat-frontend
+          image: sustainatltd/sustainat-project-client:latest  # ✅ Your Docker Hub image
+          ports:
+            - containerPort: 80  # 🧠 Matches your React production server port (nginx)
+
+---
+# -------------------------------
+# 🌐 Service for Frontend (NodePort)
+# -------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: sustainat-frontend-service
+  namespace: sustainat
+spec:
+  type: NodePort  # 🌍 Expose outside world through node port
+  selector:
+    app: sustainat-frontend
+  ports:
+    - port: 80          # 🧭 Port inside the cluster
+      targetPort: 80    # 🧭 Port exposed by container
+      nodePort: 30008   # 🌍 Accessible from host at http://localhost:30008

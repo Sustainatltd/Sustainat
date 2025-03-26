@@ -1,0 +1,29 @@
+# -------------------------------
+# ⚙️ Deployment for Node.js Backend
+# -------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sustainat-backend
+  namespace: sustainat
+  labels:
+    app: sustainat-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sustainat-backend
+  template:
+    metadata:
+      labels:
+        app: sustainat-backend
+    spec:
+      containers:
+        - name: sustainat-backend
+          image: sustainatltd/sustainat-project-server:latest # ✅ Use your Docker Hub image
+          imagePullPolicy: Always # ✅ Force Kubernetes to pull it from Docker Hub
+          ports:
+            - containerPort: 5001
+          env:
+            - name: MONGO_URL
+              value: mongodb://sustainat-mongo:27017/sustainat

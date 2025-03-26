@@ -1,0 +1,16 @@
+# k8s/frontend-service.yaml
+# 🌐 Exposes your React frontend running in the pod
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sustainat-frontend-service
+  namespace: sustainat  # 💡 Must match the namespace you created
+spec:
+  type: NodePort  # 📡 Exposes the frontend on a port accessible via Minikube
+  selector:
+    app: sustainat-frontend  # 🔗 Matches the frontend deployment
+  ports:
+    - port: 80          # 📦 Port exposed by the service
+      targetPort: 80    # 🛠️ Port your container listens to
+      nodePort: 30008   # 🌍 Port you access in browser (Minikube assigns this)

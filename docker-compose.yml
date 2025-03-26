@@ -1,0 +1,50 @@
+# ✅ This is a Docker Compose configuration file for both client and server
+
+version: '3.8'
+
+services:
+  client:
+    # 📦 Build the frontend using the Dockerfile in ./client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"  # 🌐 Map port 80 inside container to localhost:3000
+    depends_on:
+      - server     # ⏳ Wait until backend is ready
+    networks:
+      - sustainat-net
+
+  server:
+    # ⚙️ Build the backend using Dockerfile in ./server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"  # 🛠️ Map internal port 5001 to host
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/sustainat
+      - JWT_SECRET=your_jwt_secret_here
+    depends_on:
+      - mongo
+    networks:
+      - sustainat-net
+
+  mongo:
+    # 🐳 Use the official MongoDB image
+    image: mongo:latest
+    container_name: sustainat-mongo
+    ports:
+      - "27017:27017"  # 📦 MongoDB runs on 27017
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - sustainat-net
+
+# 🧱 Define a shared network
+networks:
+  sustainat-net:
+
+# 💾 Persistent MongoDB volume
+volumes:
+  mongo-data:
