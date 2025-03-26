@@ -2,7 +2,7 @@
 
 > A full-stack job application platform focused on sustainability 🌍  
 > Built with ❤️ by **Sumanth Moparthi** and **ChatGPT (OpenAI)**  
-> 📅 Last updated: 2025-03-26
+> 📅 Last updated: 2025-03-26 Time: Every possiable time
 
 ---
 
