@@ -10,44 +10,42 @@ on:
 
 jobs:
   build-and-push:
-    # 🧑‍💻 Use the latest Ubuntu runner
     runs-on: ubuntu-latest
 
-    # 🔐 Use GitHub secrets for login
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
     steps:
-      # 📥 Step 1: Checkout repository
+      # 📥 Step 1: Checkout code from GitHub repo
       - name: 📦 Checkout repository
         uses: actions/checkout@v3
 
-      # 🐳 Step 2: Set up Docker Buildx
+      # 🐳 Step 2: Enable Docker Buildx (for advanced builds)
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 🔐 Step 3: Login to Docker Hub
+      # 🔐 Step 3: Authenticate to Docker Hub using secrets
       - name: 🔐 Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
-      # 🛠️ Step 4: Build and Push Backend
+      # 🛠️ Step 4: Build and push backend Docker image
       - name: 📤 Build and Push Backend (server)
         uses: docker/build-push-action@v5
         with:
-          context: ./server               # 📁 Backend directory
-          file: ./server/Dockerfile       # ✅ Dockerfile inside server folder
+          context: ./server            # 👈 Enter the server folder
+          file: Dockerfile             # ✅ Look for Dockerfile inside ./server
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/sustainat-project-server:latest
 
-      # 🎨 Step 5: Build and Push Frontend
+      # 🎨 Step 5: Build and push frontend Docker image
       - name: 📤 Build and Push Frontend (client)
         uses: docker/build-push-action@v5
         with:
-          context: ./client               # 📁 Frontend directory
-          file: ./client/Dockerfile       # ✅ Dockerfile inside client folder
+          context: ./client            # 👈 Enter the client folder
+          file: Dockerfile             # ✅ Look for Dockerfile inside ./client
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/sustainat-project-client:latest
