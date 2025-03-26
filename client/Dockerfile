@@ -1,11 +1,31 @@
-# Use a lightweight web server to serve static files
+# ✅ First stage: Build React app
+FROM node:18-alpine AS builder
+
+# 📁 Set working directory
+WORKDIR /app
+
+# 📦 Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# 📁 Copy source code
+COPY . .
+
+# 🛠️ Build production version of React app
+RUN npm run build
+
+
+# ✅ Second stage: Serve using NGINX
 FROM nginx:alpine
 
-# Copy build folder to NGINX's default web folder
-COPY build/ /usr/share/nginx/html
+# 🧹 Clean the default NGINX public directory
+RUN rm -rf /usr/share/nginx/html/*
 
-# Expose port 80 (default web port)
+# 📂 Copy built files from builder stage
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# 🚪 Expose port 80 for traffic
 EXPOSE 80
 
-# Start the NGINX web server
+# 🚀 Start NGINX
 CMD ["nginx", "-g", "daemon off;"]
