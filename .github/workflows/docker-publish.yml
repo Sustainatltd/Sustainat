@@ -5,7 +5,7 @@ name: 🚀 CI/CD Docker Deployment
 # 🛎️ Trigger this workflow when code is pushed to the main branch
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main" , "master"]
 
 jobs:
   build-and-push:
