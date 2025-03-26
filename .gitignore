@@ -1,0 +1,14 @@
+# 🚫 Ignore node_modules and logs
+node_modules/
+.env
+logs
+*.log
+
+# ⚙️ Ignore build and OS-specific files
+build/
+dist/
+.DS_Store
+
+# 🐳 Ignore Docker local files (optional)
+*.local
+docker-compose.override.yml
