@@ -1,9 +1,8 @@
 # 🚀 CI/CD Workflow: Build & Push Docker Images to Docker Hub
-# 👨‍💻 Authors: Sumanth Moparthi and ChatGPT
 
 name: 🚀 CI/CD Docker Deployment
 
-# 🛎️ Trigger on both main and master branches
+# 🛎️ Trigger this workflow on push to main or master
 on:
   push:
     branches: [ "main", "master" ]
@@ -17,35 +16,35 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKER_TOKEN }}
 
     steps:
-      # 📥 Step 1: Checkout code from GitHub repo
+      # 📥 Step 1: Checkout the repository
       - name: 📦 Checkout repository
         uses: actions/checkout@v3
 
-      # 🐳 Step 2: Enable Docker Buildx (for advanced builds)
+      # 🐳 Step 2: Set up Docker Buildx
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 🔐 Step 3: Authenticate to Docker Hub using secrets
+      # 🔐 Step 3: Login to Docker Hub
       - name: 🔐 Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
           password: ${{ env.DOCKERHUB_TOKEN }}
 
-      # 🛠️ Step 4: Build and push backend Docker image
+      # 🛠️ Step 4: Build & Push Backend Image
       - name: 📤 Build and Push Backend (server)
         uses: docker/build-push-action@v5
         with:
-          context: ./server            # 👈 Enter the server folder
-          file: Dockerfile             # ✅ Look for Dockerfile inside ./server
+          context: ./server
+          file: ./server/Dockerfile   # ✅ Correct path
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/sustainat-project-server:latest
 
-      # 🎨 Step 5: Build and push frontend Docker image
+      # 🎨 Step 5: Build & Push Frontend Image
       - name: 📤 Build and Push Frontend (client)
         uses: docker/build-push-action@v5
         with:
-          context: ./client            # 👈 Enter the client folder
-          file: Dockerfile             # ✅ Look for Dockerfile inside ./client
+          context: ./client
+          file: ./client/Dockerfile   # ✅ Correct path
           push: true
           tags: ${{ env.DOCKERHUB_USERNAME }}/sustainat-project-client:latest
