@@ -1,52 +1,79 @@
-# 🌱 Sustainat
+# ♻️ Sustainat
 
-**Sustainat** is a full-stack web application designed to empower users with job tracking and application features—built with sustainability and global collaboration in mind.
-
----
-
-## 🚀 Project Overview
-
-Sustainat is a modern MERN-based (MongoDB, Express, React, Node.js) application with Kubernetes-native deployment, CI/CD automation, and observability features. This architecture supports developers collaborating from around the world via Docker and GitHub.
+> **Empowering sustainable careers & conscious hiring.**  
+> A full-stack web application that connects eco-conscious job seekers with green companies.
 
 ---
 
-## 🛠 Tech Stack
+## 📌 Table of Contents
 
-### 🔹 Frontend
-- React (Vite)
-- Dockerized and deployed via Kubernetes (Minikube)
-- Served using **NGINX**
+- [About the Project](#about-the-project)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Docker & Kubernetes Setup](#docker--kubernetes-setup)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Monitoring (Prometheus & Grafana)](#monitoring-prometheus--grafana)
+- [Setup Instructions](#setup-instructions)
+- [Screenshots](#screenshots)
+- [Authors](#authors)
 
-### 🔹 Backend
-- Node.js + Express
-- MongoDB with Mongoose ORM
-- Prometheus metrics exposed at `/metrics`
+---
 
-### 🔹 Infrastructure
+## 📖 About the Project
+
+**Sustainat** is a sustainability-focused job board and recruitment platform built with the mission to support climate-positive careers. It streamlines job applications, company tracking, and analytics for both candidates and employers in the green tech space.
+
+---
+
+## ✨ Features
+
+- 🔐 User Authentication (JWT-based)
+- 📄 Job Posting & Application Tracking
+- 📊 Dashboard to track company applications
+- 🔍 CSV export of job applications
+- 🐳 Dockerized frontend and backend
+- ☸️ Deployed on Kubernetes via Minikube
+- 📈 Metrics via Prometheus
+- 📊 Visualization via Grafana
+- ⚙️ CI/CD automation using GitHub Actions
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React.js (Vite)
+- Axios
+- Tailwind CSS
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB (via Mongoose)
+
+### DevOps & Monitoring
+- Docker & Docker Hub
 - Kubernetes (Minikube)
-- GitHub Actions for CI/CD
-- Docker Hub for container registry
-
-### 🔹 Monitoring & Observability
-- Prometheus (metrics scraping)
-- Grafana (visual dashboards for backend metrics)
+- Prometheus
+- Grafana
+- GitHub Actions
 
 ---
 
-## 📦 Project Structure
+## 🏗️ Architecture
 
 ```bash
-Sustainat-project/
-├── .github/workflows/           # GitHub Actions for CI/CD
-├── client/                      # React frontend
-│   └── Dockerfile               # Builds and serves frontend
-├── server/                      # Node.js backend
-│   └── Dockerfile               # Exposes REST API + Prometheus metrics
-├── k8s/                         # Kubernetes manifests
-│   ├── backend-deployment.yaml
+📦 Sustainat-project
+├── client               # React frontend
+├── server               # Node.js backend with MongoDB
+├── k8s                  # Kubernetes manifests
 │   ├── frontend-deployment.yaml
-│   ├── monitoring/
-│   │   ├── prometheus.yaml
-│   │   └── grafana.yaml
-├── docker-compose.yml          # For local development (optional)
-└── .gitignore
+│   ├── backend-deployment.yaml
+│   └── monitoring/
+│       ├── prometheus.yaml
+│       └── grafana.yaml
+├── .github/workflows    # GitHub Actions CI/CD
+│   └── docker-publish.yml
+├── docker-compose.yml   # For local development (optional)
+└── README.md
