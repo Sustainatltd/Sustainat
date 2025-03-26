@@ -1,0 +1,21 @@
+# Use Kubernetes API version for services
+apiVersion: v1
+
+# Type of object we’re creating
+kind: Service
+
+# Metadata = labels and name for the service
+metadata:
+  name: sustainat-service  # Name of the service
+
+# Spec = actual configuration of the service
+spec:
+  type: NodePort  # Expose app outside the cluster using a node port
+  selector:
+    app: sustainat  # Must match the pod's label (connects to your deployment)
+
+  ports:
+    - protocol: TCP         # Use HTTP (TCP protocol)
+      port: 80              # Port the service will expose
+      targetPort: 80        # Port your container is listening on
+      nodePort: 30080       # Port on your Mac to access the service (http://localhost:30080)

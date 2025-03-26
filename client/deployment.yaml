@@ -1,0 +1,29 @@
+# Use Kubernetes API version for Deployments
+apiVersion: apps/v1
+
+# Type of object we’re creating
+kind: Deployment
+
+# Metadata is just labels and names for K8s to organize
+metadata:
+  name: sustainat-deployment  # Unique name for this deployment
+
+# Spec is the actual configuration
+spec:
+  replicas: 1  # Number of pods (instances of the app)
+  selector:
+    matchLabels:
+      app: sustainat  # Match pod labels below
+
+  # Define the template for the pod to be created
+  template:
+    metadata:
+      labels:
+        app: sustainat  # This must match the selector above
+    spec:
+      containers:
+        - name: sustainat-container  # Name of the container
+          image: sustainat-app       # Your local Docker image name (built earlier)
+          imagePullPolicy: Never     # Use local image, don't pull from Docker Hub
+          ports:
+            - containerPort: 80      # The port the app is running inside the container
