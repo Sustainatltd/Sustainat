@@ -49,3 +49,33 @@ Sustainat-project/
 ├── .github/workflows/         # GitHub Actions workflow for CI/CD
 ├── .env.example                # Sample environment file
 └── README.md                   # You’re reading it!
+
+---
+
+## 🚀 Local Deployment (For Developers)
+
+If you're a developer and want to run the Sustainat project on your machine:
+
+### 🔧 Prerequisites
+- Docker installed
+- Node.js installed
+- Kubernetes + Minikube installed
+- `kubectl` command line tool
+
+---
+
+### 🛠️ Build and Push Docker Images
+
+This happens automatically using GitHub Actions when you push to the `main` branch.  
+But you can also do it manually like this:
+
+```bash
+# Build backend
+cd server
+docker build -t sustainatltd/sustainat-project-server .
+docker push sustainatltd/sustainat-project-server
+
+# Build frontend
+cd ../client
+docker build -t sustainatltd/sustainat-project-client .
+docker push sustainatltd/sustainat-project-client

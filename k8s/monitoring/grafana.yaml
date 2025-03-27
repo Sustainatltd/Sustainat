@@ -1,0 +1,71 @@
+# -----------------------------------------------------
+# 📦 ConfigMap to automatically connect Grafana to Prometheus
+# -----------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasource               # 🏷️ Name of the config map
+  namespace: monitoring                  # 📦 Placed inside the "monitoring" namespace
+data:
+  datasource.yaml: |                     # 📄 This is the actual file inside the config map
+    apiVersion: 1
+    datasources:
+      - name: Prometheus                 # 📊 This is the data source name shown in Grafana
+        type: prometheus                 # 🔌 We're connecting to Prometheus
+        access: proxy                    # 📡 Proxy = Grafana will handle the request for you
+        url: http://prometheus-service.monitoring.svc.cluster.local:9090  # 🌐 Prometheus service URL inside Kubernetes
+        isDefault: true                  # ✅ Set this as the default data source
+
+---
+# -----------------------------------------------------
+# 🚀 Grafana Deployment (runs the Grafana container)
+# -----------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-deployment              # 🏷️ Name of the deployment
+  namespace: monitoring                 # 📦 Inside the "monitoring" namespace
+spec:
+  replicas: 1                           # 👥 We only want 1 pod running
+  selector:
+    matchLabels:
+      app: grafana                      # 🔎 Match pods with this label
+  template:
+    metadata:
+      labels:
+        app: grafana                    # 🏷️ Label the pod as "grafana"
+    spec:
+      containers:
+        - name: grafana                 # 📦 Container name
+          image: grafana/grafana:latest # 🖼️ Docker image from Docker Hub
+          ports:
+            - containerPort: 3000      # 🚪 Grafana listens inside the container on port 3000
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana   # 💾 Where Grafana saves dashboards/data
+            - name: grafana-config
+              mountPath: /etc/grafana/provisioning/datasources  # 📁 Where the datasource config is mounted
+      volumes:
+        - name: grafana-storage
+          emptyDir: {}                 # 🗂️ Temporary in-memory storage for Grafana (non-persistent)
+        - name: grafana-config
+          configMap:
+            name: grafana-datasource   # 🔗 Connects to the ConfigMap we defined above
+
+---
+# -----------------------------------------------------
+# 🌐 Grafana Service (to access Grafana in browser)
+# -----------------------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service                 # 🏷️ Name of the service
+  namespace: monitoring                # 📦 In the "monitoring" namespace
+spec:
+  type: NodePort                       # 🌐 Expose it outside using a port on your machine
+  selector:
+    app: grafana                      # 🔍 Link this service to the Grafana pod
+  ports:
+    - port: 3000                      # 📥 Internal service port (used inside the cluster)
+      targetPort: 3000               # 🎯 Port that the pod/container listens to
+      nodePort: 30009                # 🌍 Port exposed to your laptop/browser (http://localhost:30009)
