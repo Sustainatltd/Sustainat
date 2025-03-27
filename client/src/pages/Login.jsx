@@ -1,59 +1,59 @@
-// 📦 React + Router imports
+// 📦 React imports
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
-  // 📋 State to track form inputs
+  // 📥 Track email and password inputs
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // 🧭 Hook to navigate programmatically
-  const navigate = useNavigate();
+  // 🧠 Save a message to show login success or error
+  const [message, setMessage] = useState('');
 
-  // 🔐 Function to handle login form submission
-  const handleLogin = async (e) => {
-    e.preventDefault(); // 🛑 Stop default form refresh
+  const navigate = useNavigate(); // 🚀 For redirection
+
+  // 🧠 This function runs when you click Login
+  const onSubmit = async (e) => {
+    e.preventDefault(); // 🚫 Don't refresh the page
 
     try {
-      // 📤 Send login credentials to backend
-      const res = await fetch("http://192.168.49.2:30001/api/login", {
+      // ✅ Make the API call to the backend to log in
+      const response = await fetch('/api/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }) // 🧾 Send data
+        headers: {
+          'Content-Type': 'application/json' // 📦 Sending JSON
+        },
+        body: JSON.stringify({ email, password }) // 📤 Send email & password
       });
 
-      const data = await res.json(); // 📥 Parse response
+      const data = await response.json(); // 📥 Convert response to JS object
 
-      // ❌ Show error if login fails (wrong email or password)
-      if (!res.ok) {
-        alert(data.message || 'Login failed');
-        return;
+      if (response.ok) {
+        // ✅ Login worked!
+        setMessage('✅ Login successful!');
+        localStorage.setItem('user', JSON.stringify(data.user)); // 💾 Save user data
+        localStorage.setItem('isLoggedIn', 'true');
+
+        if (data.user?.email && data.user.email.includes('hr@')) {
+          localStorage.setItem('hrEmail', data.user.email); // 💼 For HR dashboard
+        }
+
+        navigate('/'); // 🏠 Redirect to homepage
+      } else {
+        // ❌ Something wrong with login
+        setMessage(`❌ ${data.message}`);
       }
-
-      // ✅ Store user info in localStorage to stay logged in
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('isLoggedIn', 'true');
-
-      // ✅ If email is HR, also store separately
-      if (data.user.email.includes('hr@')) {
-        localStorage.setItem('hrEmail', data.user.email);
-      }
-
-      alert('✅ Logged in successfully!');
-      navigate('/'); // 🏠 Redirect to homepage
-
     } catch (err) {
       console.error('❌ Login error:', err);
-      alert('Something went wrong while logging in');
+      setMessage('❌ Something went wrong while logging in');
     }
   };
 
+  // 🎨 Render form on screen
   return (
     <div style={{ padding: '40px', fontFamily: 'Arial' }}>
-      <h2>🔐 Login to Sustainat</h2>
-
-      {/* 🔑 Login Form */}
-      <form onSubmit={handleLogin} style={{ maxWidth: '400px' }}>
+      <h2>🔐 Login</h2>
+      <form onSubmit={onSubmit} style={{ maxWidth: '400px' }}>
         <input
           type="email"
           placeholder="Email"
@@ -74,11 +74,12 @@ function Login() {
         />
         <button type="submit" style={submitBtn}>Login</button>
       </form>
+      <p>{message}</p> {/* 🧠 Show messages here */}
     </div>
   );
 }
 
-// 🎨 Reusable input styling
+// ✨ Style for input fields
 const inputStyle = {
   display: 'block',
   width: '100%',
@@ -87,7 +88,7 @@ const inputStyle = {
   fontSize: '16px'
 };
 
-// 🎨 Style for the login button
+// ✨ Style for Login button
 const submitBtn = {
   backgroundColor: 'green',
   color: 'white',
@@ -98,5 +99,5 @@ const submitBtn = {
   cursor: 'pointer'
 };
 
-// 📤 Export the Login component
+// 📤 Export so App.js can use it
 export default Login;

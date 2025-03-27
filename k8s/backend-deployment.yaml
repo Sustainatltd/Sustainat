@@ -1,29 +1,37 @@
 # -------------------------------
 # ⚙️ Deployment for Node.js Backend
 # -------------------------------
-apiVersion: apps/v1
+apiVersion: apps/v1              # 🧠 This tells Kubernetes it's a Deployment type
 kind: Deployment
 metadata:
-  name: sustainat-backend
-  namespace: sustainat
+  name: sustainat-backend        # 📛 Name of our deployment
+  namespace: sustainat           # 📦 Deploy in the "sustainat" namespace
   labels:
-    app: sustainat-backend
+    app: sustainat-backend       # 🏷️ Label to match selectors later
+
 spec:
-  replicas: 1
+  replicas: 1                    # 👶 Just 1 backend pod is enough for now
   selector:
     matchLabels:
-      app: sustainat-backend
-  template:
+      app: sustainat-backend     # 🎯 This should match pod labels exactly below
+
+  template:                      # 🧪 This is the pod template
     metadata:
       labels:
-        app: sustainat-backend
+        app: sustainat-backend   # ✅ Same label for pod
     spec:
       containers:
         - name: sustainat-backend
-          image: sustainatltd/sustainat-project-server:latest # ✅ Use your Docker Hub image
-          imagePullPolicy: Always # ✅ Force Kubernetes to pull it from Docker Hub
+          image: sustainatltd/sustainat-project-server:latest  # 🐳 Docker image from Docker Hub
+          imagePullPolicy: Always       # 🔁 Always pull latest image
+
           ports:
-            - containerPort: 5001
-          env:
-              - name: MONGO_URI
-                value: mongodb://sustainat-mongo:27017/sustainat
+            - containerPort: 5001       # 🚪 This is where backend listens (from server.js)
+
+          env:                          # 🌱 Environment variables
+            - name: MONGO_URI           # 🔌 MongoDB connection string
+              value: mongodb://sustainat-mongo:27017/sustainat
+
+            - name: JWT_SECRET          # 🔐 Secret used to sign JWT tokens
+              value: thisisasecretkey
+

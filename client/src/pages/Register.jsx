@@ -3,52 +3,53 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
-  // 🧠 State to hold form inputs
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
+  // 📥 Form input fields (what the user types)
+  const [name, setName] = useState('');         // 👤 Full name
+  const [email, setEmail] = useState('');       // 📧 Email
+  const [password, setPassword] = useState(''); // 🔐 Password
+  const [confirm, setConfirm] = useState('');   // 🔐 Confirm password
 
-  // 🚀 To programmatically redirect user after registration
+  // 🚀 Used to send user to another page after success
   const navigate = useNavigate();
 
-  // 📝 Function that runs when user clicks Register
+  // 🧠 This function runs when the user clicks the Register button
   const handleRegister = async (e) => {
-    e.preventDefault(); // 🛑 Prevent default page reload on form submit
+    e.preventDefault(); // 🛑 Stop the page from reloading
 
-    // ❌ Check if passwords match
+    // ❌ If passwords don't match, show an alert and stop here
     if (password !== confirm) {
       alert('❌ Passwords do not match');
       return;
     }
 
     try {
-      // 📤 Send POST request to backend register API
-      const res = await fetch("http://192.168.49.2:30001/api/login", {
+      // ✅ Send registration request to the backend
+      // ✅ Use a RELATIVE PATH so it works on any server (like "/api/register")
+      const res = await fetch('/api/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }) // 🧾 Send user info
+        headers: { 'Content-Type': 'application/json' }, // 📦 We're sending JSON
+        body: JSON.stringify({ name, email, password })  // 📤 Send user data
       });
 
-      const data = await res.json(); // 📥 Convert response to JS object
+      const data = await res.json(); // 📥 Convert backend response to JSON
 
-      // ❌ If backend returns an error
       if (!res.ok) {
+        // ❌ If backend sends an error
         alert(data.message || 'Registration failed');
         return;
       }
 
-      // ✅ Save user info locally so they stay logged in
+      // ✅ Save user info to localStorage so they stay logged in
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('isLoggedIn', 'true');
 
-      // 🏢 If this is an HR user (based on email), store it separately
+      // 📧 If the user is an HR person (email includes "hr@")
       if (data.user?.email && data.user.email.includes('hr@')) {
         localStorage.setItem('hrEmail', data.user.email);
       }
 
       alert('✅ Registered successfully!');
-      navigate('/'); // 🔁 Redirect to homepage
+      navigate('/'); // 🏠 Go back to homepage
 
     } catch (err) {
       console.error('❌ Registration error:', err);
@@ -56,12 +57,11 @@ function Register() {
     }
   };
 
-  // 🖼️ What appears on the screen
+  // 🎨 UI - What appears on the screen
   return (
     <div style={{ padding: '40px', fontFamily: 'Arial' }}>
       <h2>📝 Register</h2>
       
-      {/* 📋 Registration Form */}
       <form onSubmit={handleRegister} style={{ maxWidth: '400px' }}>
         <input
           type="text"
@@ -105,7 +105,7 @@ function Register() {
   );
 }
 
-// 🎨 Style applied to all input fields
+// ✨ Style for input boxes
 const inputStyle = {
   display: 'block',
   width: '100%',
@@ -114,7 +114,7 @@ const inputStyle = {
   fontSize: '16px'
 };
 
-// 🎨 Style for the submit button
+// ✨ Style for the green "Register" button
 const submitBtn = {
   backgroundColor: 'green',
   color: 'white',
@@ -125,5 +125,5 @@ const submitBtn = {
   cursor: 'pointer'
 };
 
-// 📤 Export the Register component to be used in the app
+// 📤 Export this component so App.js can use it
 export default Register;
