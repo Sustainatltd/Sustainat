@@ -25,5 +25,5 @@ spec:
           ports:
             - containerPort: 5001
           env:
-            - name: MONGO_URL
-              value: mongodb://sustainat-mongo:27017/sustainat
+              - name: MONGO_URI
+                value: mongodb://sustainat-mongo:27017/sustainat

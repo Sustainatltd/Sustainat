@@ -16,7 +16,7 @@ function Login() {
 
     try {
       // 📤 Send login credentials to backend
-      const res = await fetch('http://localhost:30001/api/login', {
+      const res = await fetch("http://192.168.49.2:30001/api/login", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }) // 🧾 Send data

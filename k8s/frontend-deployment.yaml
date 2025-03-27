@@ -21,6 +21,7 @@ spec:
       containers:
         - name: sustainat-frontend
           image: sustainatltd/sustainat-project-client:latest  # ✅ Your Docker Hub image
+          imagePullPolicy: Always          # ✅ THIS LINE IS VERY IMPORTANT
           ports:
             - containerPort: 80  # 🧠 Matches your React production server port (nginx)
 

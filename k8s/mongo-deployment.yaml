@@ -1,0 +1,38 @@
+# -------------------------------
+# 📦 MongoDB Deployment
+# -------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sustainat-mongo
+  namespace: sustainat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sustainat-mongo
+  template:
+    metadata:
+      labels:
+        app: sustainat-mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+---
+# -------------------------------
+# 🌐 MongoDB Service
+# -------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: sustainat-mongo
+  namespace: sustainat
+spec:
+  selector:
+    app: sustainat-mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
