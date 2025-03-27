@@ -24,7 +24,7 @@ function Register() {
 
     try {
       // 📤 Send POST request to backend register API
-      const res = await fetch('http://localhost:5001/api/register', {
+      const res = await fetch('http://localhost:30001/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }) // 🧾 Send user info
