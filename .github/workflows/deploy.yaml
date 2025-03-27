@@ -1,0 +1,30 @@
+# 🚀 This is your Kubernetes deployment workflow
+# It will run when code is pushed to 'main' or 'master'
+
+name: 🚢 Auto Deploy to Kubernetes
+
+on:
+  push:
+    branches: [ "main", "master" ]  # ✅ Trigger on push to main/master
+
+jobs:
+  deploy:
+    name: 🧠 Deploy to Kubernetes (Minikube)
+    runs-on: ubuntu-latest  # 💻 Run this on a virtual Linux machine
+
+    steps:
+      # 📦 Step 1: Checkout your GitHub repo code
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v3
+
+      # ❗ Step 2: This is a placeholder for real kubectl access
+      # 🛑 Minikube is local. So this won't work directly from GitHub yet.
+      # ✅ In real-world use: you can add cloud kubeconfig here (for AWS, GKE, etc.)
+      - name: 📝 Show deployment instructions (for now)
+        run: |
+          echo "📢 Hey Sumanth! In real-world CI/CD, this step would run:"
+          echo "kubectl apply -f k8s/frontend-deployment.yaml"
+          echo "kubectl apply -f k8s/frontend-service.yaml"
+          echo "kubectl apply -f k8s/backend-deployment.yaml"
+          echo "kubectl apply -f k8s/backend-service.yaml"
+          echo "⏳ But because you're using Minikube locally, run these manually for now!"
