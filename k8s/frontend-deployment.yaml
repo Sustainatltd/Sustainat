@@ -1,44 +1,47 @@
-# -------------------------------
-# 📦 Deployment for React Frontend
-# -------------------------------
-apiVersion: apps/v1
+# -----------------------------------------------
+# 📦 Kubernetes Deployment for React Frontend
+# -----------------------------------------------
+apiVersion: apps/v1                 # 🧠 Tells Kubernetes this is a Deployment
 kind: Deployment
 metadata:
-  name: sustainat-frontend
-  namespace: sustainat
+  name: sustainat-frontend          # 📛 Name of the deployment
+  namespace: sustainat              # 📦 It goes inside the "sustainat" namespace
   labels:
-    app: sustainat-frontend
+    app: sustainat-frontend         # 🏷️ This label helps connect with the service
+
 spec:
-  replicas: 1
+  replicas: 1                       # 👶 Start with 1 copy of the frontend (1 pod)
   selector:
     matchLabels:
-      app: sustainat-frontend
-  template:
+      app: sustainat-frontend       # 🎯 Must match the pod label below
+
+  template:                         # 📦 This template defines how the pod will look
     metadata:
       labels:
-        app: sustainat-frontend
-    spec:  # 👈 Fixed indentation starts here
+        app: sustainat-frontend     # ✅ The pod gets this label
+    spec:
       containers:
-        - name: sustainat-frontend
-          image: sustainatltd/sustainat-project-client:latest  # ✅ Your Docker Hub image
-          imagePullPolicy: Always          # ✅ THIS LINE IS VERY IMPORTANT
+        - name: sustainat-frontend                    # 🐳 Name of the container
+          image: sustainatltd/sustainat-project-client:latest  # 📥 Pull from Docker Hub
+          imagePullPolicy: Always                     # 🔁 Always fetch the latest image
           ports:
-            - containerPort: 80  # 🧠 Matches your React production server port (nginx)
+            - containerPort: 80                       # 🚪 React (nginx) runs on port 80 inside container
 
 ---
-# -------------------------------
-# 🌐 Service for Frontend (NodePort)
-# -------------------------------
+# -----------------------------------------------
+# 🌐 Kubernetes Service for React Frontend (NodePort)
+# -----------------------------------------------
 apiVersion: v1
 kind: Service
 metadata:
-  name: sustainat-frontend-service
-  namespace: sustainat
+  name: sustainat-frontend-service   # 📛 Name of the service
+  namespace: sustainat               # 📦 Same namespace as the frontend deployment
+
 spec:
-  type: NodePort  # 🌍 Expose outside world through node port
+  type: NodePort                     # 🌍 Makes it accessible via Minikube
   selector:
-    app: sustainat-frontend
+    app: sustainat-frontend          # 🔗 Targets pods with this label
   ports:
-    - port: 80          # 🧭 Port inside the cluster
-      targetPort: 80    # 🧭 Port exposed by container
-      nodePort: 30008   # 🌍 Accessible from host at http://localhost:30008
+    - port: 80                       # 🔁 Port inside the cluster
+      targetPort: 80                 # 📥 Port where container serves React app
+      nodePort: 30008                # 🖥️ Access from browser: http://localhost:30008/

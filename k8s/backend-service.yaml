@@ -1,16 +1,20 @@
-# -------------------------------
-# 🌐 Service for Backend (NodePort)
-# -------------------------------
-apiVersion: v1
-kind: Service
+# -----------------------------------------------
+# 🌐 Kubernetes Service for Backend (NodePort)
+# -----------------------------------------------
+apiVersion: v1                       # 🔢 This is a core Kubernetes resource
+kind: Service                        # 📡 We're creating a Service to expose our backend
 metadata:
-  name: sustainat-backend-service
-  namespace: sustainat
+  name: sustainat-backend-service   # 📛 Name of the service
+  namespace: sustainat              # 📦 This service belongs to the "sustainat" namespace
+
 spec:
-  type: NodePort # 🔁 Makes it accessible outside the cluster (via Minikube)
+  type: NodePort                    # 🚪 This makes the backend accessible from outside the cluster
+                                    # (Perfect for Minikube, useful during local testing)
+
   selector:
-    app: sustainat-backend
+    app: sustainat-backend          # 🎯 This selects the pod with the same label (defined in deployment)
+
   ports:
-    - port: 5001          # 🎯 Cluster port
-      targetPort: 5001    # 🚪 Port inside the container
-      nodePort: 30001     # 🌍 External access via localhost:30001
+    - port: 5001                    # 📡 Port inside the Kubernetes cluster
+      targetPort: 5001              # 🎯 Port where the app (Node.js server) is running inside the pod
+      nodePort: 30001               # 🌍 Port exposed to your laptop: http://localhost:30001/

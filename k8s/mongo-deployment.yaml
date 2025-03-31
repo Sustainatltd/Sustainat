@@ -1,38 +1,41 @@
-# -------------------------------
-# 📦 MongoDB Deployment
-# -------------------------------
+# ------------------------------------------
+# 📦 Kubernetes Deployment for MongoDB
+# ------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sustainat-mongo
-  namespace: sustainat
+  name: sustainat-mongo           # 📛 Name of this deployment
+  namespace: sustainat            # 📦 This belongs to the "sustainat" namespace
 spec:
-  replicas: 1
+  replicas: 1                     # 👶 One MongoDB pod is enough for now
   selector:
     matchLabels:
-      app: sustainat-mongo
+      app: sustainat-mongo        # 🎯 This label must match pod label below
+
   template:
     metadata:
       labels:
-        app: sustainat-mongo
+        app: sustainat-mongo      # ✅ Pod will be labeled with this
     spec:
       containers:
-        - name: mongo
-          image: mongo:latest
+        - name: mongo                        # 🐳 Name of the container inside the pod
+          image: mongo:latest                # 📥 Pull the official MongoDB image from Docker Hub
           ports:
-            - containerPort: 27017
+            - containerPort: 27017           # 🔌 MongoDB listens on this port (default)
+          # (optional for now) You can add volumes later to store data even after pod restarts
+
 ---
-# -------------------------------
-# 🌐 MongoDB Service
-# -------------------------------
+# ------------------------------------------
+# 🌐 Kubernetes Service for MongoDB
+# ------------------------------------------
 apiVersion: v1
 kind: Service
 metadata:
-  name: sustainat-mongo
-  namespace: sustainat
+  name: sustainat-mongo           # 📛 Name of the service (same name used in backend env)
+  namespace: sustainat            # 📦 Same namespace as the deployment
 spec:
   selector:
-    app: sustainat-mongo
+    app: sustainat-mongo          # 🔗 Connects to pods with this label
   ports:
-    - port: 27017
-      targetPort: 27017
+    - port: 27017                 # 📡 Cluster port (used by backend to connect)
+      targetPort: 27017           # 🚪 Matches the container's port

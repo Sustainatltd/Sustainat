@@ -1,37 +1,36 @@
-# -------------------------------
-# ⚙️ Deployment for Node.js Backend
-# -------------------------------
-apiVersion: apps/v1              # 🧠 This tells Kubernetes it's a Deployment type
+# ----------------------------------------------
+# ⚙️ Kubernetes Deployment for Node.js Backend
+# ----------------------------------------------
+apiVersion: apps/v1              # 🧠 This tells Kubernetes we are defining a Deployment
 kind: Deployment
 metadata:
-  name: sustainat-backend        # 📛 Name of our deployment
-  namespace: sustainat           # 📦 Deploy in the "sustainat" namespace
+  name: sustainat-backend        # 📛 Unique name for this deployment
+  namespace: sustainat           # 📦 It belongs to the "sustainat" namespace (must be created first!)
   labels:
-    app: sustainat-backend       # 🏷️ Label to match selectors later
+    app: sustainat-backend       # 🏷️ Label used for selecting this app later in services
 
 spec:
-  replicas: 1                    # 👶 Just 1 backend pod is enough for now
+  replicas: 1                    # 👶 We are starting with 1 pod (instance) of backend
   selector:
     matchLabels:
-      app: sustainat-backend     # 🎯 This should match pod labels exactly below
+      app: sustainat-backend     # 🎯 This label MUST match the pod's label below
 
-  template:                      # 🧪 This is the pod template
+  template:                      # 📦 Template used to create the backend pod
     metadata:
       labels:
-        app: sustainat-backend   # ✅ Same label for pod
+        app: sustainat-backend   # ✅ Pod gets labeled as "sustainat-backend"
     spec:
       containers:
-        - name: sustainat-backend
-          image: sustainatltd/sustainat-project-server:latest  # 🐳 Docker image from Docker Hub
-          imagePullPolicy: Always       # 🔁 Always pull latest image
+        - name: sustainat-backend                 # 🐳 Name of the container inside the pod
+          image: sustainatltd/sustainat-project-server:latest  # 📥 Pull this image from Docker Hub
+          imagePullPolicy: Always                 # 🔁 Always pull the latest image when restarting
 
           ports:
-            - containerPort: 5001       # 🚪 This is where backend listens (from server.js)
+            - containerPort: 5001                 # 🚪 Port the backend app is listening on (server.js)
 
-          env:                          # 🌱 Environment variables
-            - name: MONGO_URI           # 🔌 MongoDB connection string
+          env:                                    # 🌿 Define environment variables for the app
+            - name: MONGO_URI                     # 📡 Tells backend how to connect to MongoDB
               value: mongodb://sustainat-mongo:27017/sustainat
 
-            - name: JWT_SECRET          # 🔐 Secret used to sign JWT tokens
+            - name: JWT_SECRET                    # 🔐 Secret key used to sign JWT tokens (keep safe!)
               value: thisisasecretkey
-

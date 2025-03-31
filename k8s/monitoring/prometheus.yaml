@@ -1,71 +1,77 @@
-# ---------------------------------------------
-# 📄 1. ConfigMap — This tells Prometheus where to scrape metrics from
-# ---------------------------------------------
+# ----------------------------------------------------
+# 📄 1. ConfigMap — Tells Prometheus what to monitor
+# ----------------------------------------------------
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: prometheus-config                 # 🏷️ Name of the config (referenced in Deployment)
-  namespace: monitoring                   # 📦 Put this in the "monitoring" namespace
+  name: prometheus-config                  # 📛 Unique name of the config
+  namespace: monitoring                    # 📦 Put this config inside "monitoring" namespace
   labels:
-    name: prometheus-config               # 📛 Just a label for organizing
+    name: prometheus-config                # 🏷️ Optional label for organization
+
 data:
-  prometheus.yml: |                       # 📄 This is the actual Prometheus config file (inside the pod)
+  prometheus.yml: |                        # 📄 Start of the Prometheus configuration file
     global:
-      scrape_interval: 15s                # ⏱️ Prometheus will collect metrics every 15 seconds
+      scrape_interval: 15s                 # ⏱️ Prometheus checks every 15 seconds
 
     scrape_configs:
-      - job_name: 'kubernetes-services'   # 🏷️ Friendly name shown in Prometheus UI
+      - job_name: 'kubernetes-services'    # 🏷️ Name shown on Prometheus UI
         static_configs:
-          - targets:                      # 🎯 List of services to scrape (get metrics from)
+          - targets:                       # 🎯 List of services Prometheus will scrape
               - sustainat-backend-service.sustainat.svc.cluster.local:5001
-              # 👆 This is the backend's internal DNS name inside Kubernetes
-              # It must match your backend service name + namespace + port
-# ---------------------------------------------
-# 🚀 2. Deployment — This runs the Prometheus app
-# ---------------------------------------------
+              # 🧠 This is the internal Kubernetes DNS to reach the backend service
+              # Format: <service-name>.<namespace>.svc.cluster.local:<port>
+
+---
+# ----------------------------------------------------
+# 🚀 2. Deployment — Launches Prometheus app
+# ----------------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus-deployment             # 🏷️ Name of the deployment
-  namespace: monitoring                   # 📦 Put in "monitoring" namespace
+  name: prometheus-deployment             # 📛 Deployment name
+  namespace: monitoring                   # 📦 Same namespace as the config
 spec:
-  replicas: 1                             # 👤 Only one copy needed
+  replicas: 1                             # 👤 One Prometheus pod is enough for now
   selector:
     matchLabels:
-      app: prometheus                     # 🔍 Used to connect the pod with the service
+      app: prometheus                     # 🔍 Used to connect to the service below
+
   template:
     metadata:
       labels:
-        app: prometheus                   # 🏷️ Label for this pod
+        app: prometheus                   # 🏷️ Label assigned to this pod
     spec:
       containers:
-        - name: prometheus                # 📦 Container name
-          image: prom/prometheus:latest   # 🖼️ Use official Prometheus image
+        - name: prometheus                # 🐳 Container name
+          image: prom/prometheus:latest   # 📥 Official Prometheus image from Docker Hub
           args:
-            - "--config.file=/etc/prometheus/prometheus.yml"
-            # 🔧 This tells Prometheus where to find the config file
+            - "--config.file=/etc/prometheus/prometheus.yml"  # ⚙️ Load config from mounted path
           ports:
-            - containerPort: 9090         # 🚪 Prometheus listens inside the pod on this port
+            - containerPort: 9090         # 🚪 Prometheus dashboard runs on this port
           volumeMounts:
             - name: config-volume
-              mountPath: /etc/prometheus  # 📁 Mount the configMap inside the container
+              mountPath: /etc/prometheus  # 📁 Mount configMap to this path inside the container
+
       volumes:
         - name: config-volume
           configMap:
-            name: prometheus-config       # 🔗 Connect the volume to our ConfigMap above
-# ---------------------------------------------
-# 🌐 3. Service — Makes Prometheus accessible in browser
-# ---------------------------------------------
+            name: prometheus-config       # 🔗 Use the ConfigMap defined above
+
+---
+# ----------------------------------------------------
+# 🌐 3. Service — Exposes Prometheus to browser
+# ----------------------------------------------------
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-service                # 🏷️ Name of the service
-  namespace: monitoring                   # 📦 Must match the namespace of the deployment
+  name: prometheus-service                # 📛 Name of the service
+  namespace: monitoring                   # 📦 Same namespace as deployment
 spec:
-  type: NodePort                          # 🌍 Exposes the app on a localhost port (via Minikube)
+  type: NodePort                          # 🌍 Exposes service outside (great for Minikube)
   selector:
-    app: prometheus                       # 🔗 This service links to the pod via label
+    app: prometheus                       # 🎯 Selects pods with this label
   ports:
-    - port: 9090                          # 📥 Internal cluster port
-      targetPort: 9090                   # 🎯 Prometheus is listening on this port inside pod
-      nodePort: 30090                    # 🌐 External port (use http://localhost:30090 to open)
+    - port: 9090                          # 📡 Port used inside cluster
+      targetPort: 9090                    # 🎯 Port used inside Prometheus container
+      nodePort: 30090                     # 🖥️ Access Prometheus via http://localhost:30090
