@@ -1,13 +1,15 @@
+/* 🌀 This brings in Tailwind's base styles (like reset CSS) */
+@tailwind base;
+
+/* 🎨 This brings in Tailwind's custom styles (like typography & forms) */
+@tailwind components;
+
+/* 🛠️ This brings in Tailwind's utility classes (like flex, bg-blue-500, etc.) */
+@tailwind utilities;
+
+/* ✅ You can still add your own custom styles below if needed */
 body {
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
 }

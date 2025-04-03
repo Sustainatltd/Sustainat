@@ -25,8 +25,8 @@ function App() {
       {/* 🌍 Global navigation bar - always visible */}
       <Navbar />
 
-      {/* 📦 Page content area */}
-      <div style={{ padding: '30px', fontFamily: 'Arial' }}>
+      {/* 📦 Page content area with Tailwind styling */}
+      <div className="p-8 font-sans">
         <Routes>
           {/* 🌐 Public Pages */}
           <Route path="/" element={<Home />} />
@@ -46,7 +46,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/applications"
             element={
@@ -55,7 +54,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/network"
             element={
