@@ -23,9 +23,8 @@ function Register() {
     }
 
     try {
-      // ✅ Send registration request to the backend
-      // ✅ Use a RELATIVE PATH so it works on any server (like "/api/register")
-      const res = await fetch('/api/register', {
+      // ✅ Send registration request to the backend (updated URL!)
+      const res = await fetch('http://localhost:5001/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }, // 📦 We're sending JSON
         body: JSON.stringify({ name, email, password })  // 📤 Send user data

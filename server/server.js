@@ -1,66 +1,62 @@
-// ------------------------------
+// ---------------------------------------------
 // ✅ 1. Imports and Configs
-// ------------------------------
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-const client = require('prom-client'); // 📊 Prometheus client
-require('dotenv').config(); // Loads environment variables from .env
+// ---------------------------------------------
+const express = require('express');           // 💬 Express = lets us build APIs easily
+const cors = require('cors');                 // 🌐 Allows frontend & backend to talk (Cross-Origin)
+const client = require('prom-client');        // 📊 For Prometheus monitoring
+require('dotenv').config();                   // 🔒 Loads our secret keys from the .env file
+
+const connectDB = require('./config/db');     // 🧠 Our MongoDB connection helper function
 
 const app = express();
-app.use(express.json()); // Parses incoming JSON requests
-app.use(cors()); // Enables Cross-Origin requests
+app.use(express.json());                      // 📦 Parse JSON in incoming requests
+app.use(cors());                              // 🌍 Allow different origins to connect
 
-// ------------------------------
+// ---------------------------------------------
 // 📈 2. Prometheus Metrics Setup
-// ------------------------------
+// ---------------------------------------------
 const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics(); // 🛠️ Collect Node.js default system metrics (CPU, memory, etc.)
+collectDefaultMetrics(); // 📊 Collect CPU, memory, event loop metrics
 
-// ✅ Custom /metrics endpoint for Prometheus to scrape
+// 📍 Endpoint for Prometheus to collect stats
 app.get('/metrics', async (req, res) => {
   try {
-    res.set('Content-Type', client.register.contentType); // Set response header
-    res.end(await client.register.metrics()); // Return all collected metrics
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
   } catch (err) {
     res.status(500).end(err);
   }
 });
 
-// ------------------------------
-// ✅ 3. MongoDB Connection
-// ------------------------------
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+// ---------------------------------------------
+// 🍃 3. Connect to MongoDB Atlas
+// ---------------------------------------------
+connectDB(); // 🔌 We connect to MongoDB using our external helper
 
-// ------------------------------
-// ✅ 4. Routes
-// ------------------------------
+// ---------------------------------------------
+// 🚏 4. Routes
+// ---------------------------------------------
 
-// ✅ Test route (basic health check)
+// 🌱 Health check route to test if server is running
 app.get('/', (req, res) => {
   res.send('Sustainat Backend is running');
 });
 
-// ✅ Auth Routes
+// 🔐 Auth Routes (register/login)
 const authRoutes = require('./routes/authRoutes');
 app.use('/api', authRoutes);
 
-// ✅ Job Routes
+// 💼 Job Routes (post/view jobs)
 const jobRoutes = require('./routes/jobRoutes');
 app.use('/api', jobRoutes);
 
-// ✉️ Application Route
+// ✉️ Application Routes (apply for jobs)
 const applicationRoutes = require('./routes/applicationRoutes');
 app.use('/api', applicationRoutes);
 
-// ------------------------------
-// ✅ 5. Start Server
-// ------------------------------
+// ---------------------------------------------
+// 🚀 5. Start the Server
+// ---------------------------------------------
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

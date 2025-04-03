@@ -1,36 +1,57 @@
 # ----------------------------------------------
 # ⚙️ Kubernetes Deployment for Node.js Backend
 # ----------------------------------------------
-apiVersion: apps/v1              # 🧠 This tells Kubernetes we are defining a Deployment
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sustainat-backend        # 📛 Unique name for this deployment
-  namespace: sustainat           # 📦 It belongs to the "sustainat" namespace (must be created first!)
+  name: sustainat-backend            # 📛 Name of the deployment
+  namespace: sustainat               # 📦 In the "sustainat" namespace
   labels:
-    app: sustainat-backend       # 🏷️ Label used for selecting this app later in services
+    app: sustainat-backend           # 🏷️ Label to group this app
 
 spec:
-  replicas: 1                    # 👶 We are starting with 1 pod (instance) of backend
+  replicas: 1                        # 👶 One pod to start with
   selector:
     matchLabels:
-      app: sustainat-backend     # 🎯 This label MUST match the pod's label below
+      app: sustainat-backend         # 🎯 Must match pod label
 
-  template:                      # 📦 Template used to create the backend pod
+  template:
     metadata:
       labels:
-        app: sustainat-backend   # ✅ Pod gets labeled as "sustainat-backend"
+        app: sustainat-backend       # ✅ Pod label
     spec:
       containers:
-        - name: sustainat-backend                 # 🐳 Name of the container inside the pod
-          image: sustainatltd/sustainat-project-server:latest  # 📥 Pull this image from Docker Hub
-          imagePullPolicy: Always                 # 🔁 Always pull the latest image when restarting
+        - name: sustainat-backend
+          image: sustainatltd/backend:latest       # 🐳 This is your updated Docker image!
+          imagePullPolicy: Always
 
           ports:
-            - containerPort: 5001                 # 🚪 Port the backend app is listening on (server.js)
+            - containerPort: 5001                  # 🚪 Exposes backend on port 5001
 
-          env:                                    # 🌿 Define environment variables for the app
-            - name: MONGO_URI                     # 📡 Tells backend how to connect to MongoDB
-              value: mongodb://sustainat-mongo:27017/sustainat
+          env:                                     
+            # 🔐 Load MongoDB URI securely from Kubernetes Secret
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret               # 🔑 Secret name
+                  key: MONGO_URI                   # 🔑 Key inside the secret
 
-            - name: JWT_SECRET                    # 🔐 Secret key used to sign JWT tokens (keep safe!)
-              value: thisisasecretkey
+            # 🔐 Hardcoded for now, or move to secret later
+            - name: JWT_SECRET
+              value: thisisasecretkey              # Used by backend for JWT token signing
+---
+# 🌐 Exposes the backend to outside world using NodePort
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: sustainat
+spec:
+  selector:
+    app: sustainat-backend                         # 🧲 Targets pods with this label
+  ports:
+    - protocol: TCP
+      port: 80                                     # 🌐 External port
+      targetPort: 5001                             # 🚪 Port inside the container
+      nodePort: 30011                              # 🌍 Access this using Minikube IP + 30011
+  type: NodePort
