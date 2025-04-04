@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // ✅ Reusable navigation bar
 import Navbar from './components/Navbar';
 
-// ✅ All application pages
+// ✅ All main page components
 import Home from './pages/Home';
 import Products from './pages/Products';
 import Knowledge from './pages/Knowledge';
@@ -16,19 +16,26 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Applications from './pages/Applications';
 
-// 🔒 Protect routes from unauthorized access
+// ✅ Topic pages under "Knowledge"
+import ClimateChange from './pages/ClimateChange';
+import SustainableTech from './pages/SustainableTech';
+import ZeroWaste from './pages/ZeroWaste';
+
+// 🔒 This helps protect pages so only logged-in users can see them
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
+    // 🧭 Wrap the whole app inside the router to enable page navigation
     <Router>
-      {/* 🌍 Global navigation bar - always visible */}
+      {/* 🌍 Always show the navbar at the top */}
       <Navbar />
 
-      {/* 📦 Page content area with Tailwind styling */}
+      {/* 📦 This is where page content changes based on the URL */}
       <div className="p-8 font-sans">
         <Routes>
-          {/* 🌐 Public Pages */}
+
+          {/* 🌐 Public Pages (everyone can see) */}
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/knowledge" element={<Knowledge />} />
@@ -37,7 +44,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* 🔐 Protected Pages - Only if logged in */}
+          {/* 📚 Knowledge Subpages (extra topic pages) */}
+          <Route path="/climate-change" element={<ClimateChange />} />
+          <Route path="/sustainable-tech" element={<SustainableTech />} />
+          <Route path="/zero-waste" element={<ZeroWaste />} />
+
+          {/* 🔐 Protected Pages (must be logged in to see) */}
           <Route
             path="/employment"
             element={
