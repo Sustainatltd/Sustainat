@@ -1,0 +1,27 @@
+# 🎩 This Ingress file uses nip.io to avoid DNS or /etc/hosts issues on Mac
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sustainat-ingress
+  namespace: sustainat
+spec:
+  rules:
+  - host: 127.0.0.1.nip.io  # 🌍 Magic domain that always points to localhost
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: sustainat-backend-service  # 🔙 This goes to your backend
+            port:
+              number: 5001
+
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sustainat-frontend-service  # 🎨 This goes to your React frontend
+            port:
+              number: 80

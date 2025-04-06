@@ -1,57 +1,57 @@
 # ----------------------------------------------
-# ⚙️ Kubernetes Deployment for Node.js Backend
+# 🚀 Backend Deployment - Node.js + Express
 # ----------------------------------------------
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sustainat-backend            # 📛 Name of the deployment
-  namespace: sustainat               # 📦 In the "sustainat" namespace
+  name: sustainat-backend
+  namespace: sustainat
   labels:
-    app: sustainat-backend           # 🏷️ Label to group this app
+    app: sustainat-backend
 
 spec:
-  replicas: 1                        # 👶 One pod to start with
+  replicas: 1
   selector:
     matchLabels:
-      app: sustainat-backend         # 🎯 Must match pod label
+      app: sustainat-backend
 
   template:
     metadata:
       labels:
-        app: sustainat-backend       # ✅ Pod label
+        app: sustainat-backend
     spec:
       containers:
-        - name: sustainat-backend
-          image: sustainatltd/backend:latest       # 🐳 This is your updated Docker image!
+        - name: backend
+          image: sustainatltd/sustainat-backend:latest  # ✅ Use correct Docker Hub image
           imagePullPolicy: Always
-
           ports:
-            - containerPort: 5001                  # 🚪 Exposes backend on port 5001
+            - containerPort: 5001                       # 🚪 Our backend listens on this port
 
-          env:                                     
-            # 🔐 Load MongoDB URI securely from Kubernetes Secret
+          # 🌿 Environment variables (Mongo URI + JWT secret)
+          env:
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret               # 🔑 Secret name
-                  key: MONGO_URI                   # 🔑 Key inside the secret
-
-            # 🔐 Hardcoded for now, or move to secret later
+                  name: mongo-secret
+                  key: uri
             - name: JWT_SECRET
-              value: thisisasecretkey              # Used by backend for JWT token signing
+              value: thisisasecretkey                   # Replace with real secret in production
+
 ---
-# 🌐 Exposes the backend to outside world using NodePort
+# ----------------------------------------------
+# 🌐 Backend Service (NodePort for external access)
+# ----------------------------------------------
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-service
+  name: sustainat-backend-service
   namespace: sustainat
+
 spec:
   selector:
-    app: sustainat-backend                         # 🧲 Targets pods with this label
-  ports:
-    - protocol: TCP
-      port: 80                                     # 🌐 External port
-      targetPort: 5001                             # 🚪 Port inside the container
-      nodePort: 30011                              # 🌍 Access this using Minikube IP + 30011
+    app: sustainat-backend
   type: NodePort
+  ports:
+    - port: 5001                # Inside the cluster
+      targetPort: 5001          # Inside container
+      nodePort: 30001           # Access from outside via Minikube IP

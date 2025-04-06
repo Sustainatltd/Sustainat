@@ -1,24 +1,35 @@
 // ---------------------------------------------
-// ✅ 1. Imports and Configs
+// ✅ 1. Imports and Setup
 // ---------------------------------------------
-const express = require('express');           // 💬 Express = lets us build APIs easily
-const cors = require('cors');                 // 🌐 Allows frontend & backend to talk (Cross-Origin)
-const client = require('prom-client');        // 📊 For Prometheus monitoring
-require('dotenv').config();                   // 🔒 Loads our secret keys from the .env file
+const express = require('express'); // 🛠️ Express helps us build our server
+const cors = require('cors');       // 🌐 Allows frontend to talk to backend
+const client = require('prom-client'); // 📊 For Prometheus metrics
 
-const connectDB = require('./config/db');     // 🧠 Our MongoDB connection helper function
+require('dotenv').config(); // 🔒 Load secret variables from .env file
 
-const app = express();
-app.use(express.json());                      // 📦 Parse JSON in incoming requests
-app.use(cors());                              // 🌍 Allow different origins to connect
+const connectDB = require('./config/db'); // 🔌 MongoDB connection
+const app = express(); // 🚀 Create our app
 
 // ---------------------------------------------
-// 📈 2. Prometheus Metrics Setup
+// 🔐 SAFETY CHECK: Make sure JWT_SECRET is defined
+// ---------------------------------------------
+if (!process.env.JWT_SECRET) {
+  console.error('❌ Missing JWT_SECRET in your .env file!');
+  process.exit(1); // ❌ Stop server from starting
+}
+
+// ---------------------------------------------
+// 🧠 2. Middleware
+// ---------------------------------------------
+app.use(express.json()); // 📦 Allow JSON in requests (like login, register)
+app.use(cors());         // 🌐 Allow frontend on another port (like React on 3000)
+
+// ---------------------------------------------
+// 📈 3. Prometheus Monitoring Route
 // ---------------------------------------------
 const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics(); // 📊 Collect CPU, memory, event loop metrics
+collectDefaultMetrics(); // 📊 Start collecting metrics
 
-// 📍 Endpoint for Prometheus to collect stats
 app.get('/metrics', async (req, res) => {
   try {
     res.set('Content-Type', client.register.contentType);
@@ -29,35 +40,41 @@ app.get('/metrics', async (req, res) => {
 });
 
 // ---------------------------------------------
-// 🍃 3. Connect to MongoDB Atlas
+// 🍃 4. Connect to MongoDB
 // ---------------------------------------------
-connectDB(); // 🔌 We connect to MongoDB using our external helper
+connectDB(); // ✅ Connect to database
 
 // ---------------------------------------------
-// 🚏 4. Routes
+// 🚏 5. API Routes
 // ---------------------------------------------
-
-// 🌱 Health check route to test if server is running
 app.get('/', (req, res) => {
-  res.send('Sustainat Backend is running');
+  console.log("Home route accessed"); // 🧠 Debug log
+  res.send('✅ Sustainat Backend is running');
 });
 
-// 🔐 Auth Routes (register/login)
-const authRoutes = require('./routes/authRoutes');
-app.use('/api', authRoutes);
+// 👤 Auth routes (register, login)
+app.use('/api', require('./routes/authRoutes'));
 
-// 💼 Job Routes (post/view jobs)
-const jobRoutes = require('./routes/jobRoutes');
-app.use('/api', jobRoutes);
+// 💼 Jobs (view/post)
+app.use('/api', require('./routes/jobRoutes'));
 
-// ✉️ Application Routes (apply for jobs)
-const applicationRoutes = require('./routes/applicationRoutes');
-app.use('/api', applicationRoutes);
+// 📩 Applications
+app.use('/api', require('./routes/applicationRoutes'));
+
+// 🛍️ Products (admin can manage)
+app.use('/api/products', (req, res, next) => {
+  console.log(`Product route accessed: ${req.method} ${req.originalUrl}`); // 🧠 Debug log
+  next();
+}, require('./routes/productRoutes'));
+
+// 📦 Orders (users placing orders)
+app.use('/api/orders', require('./routes/orderRoutes'));
 
 // ---------------------------------------------
-// 🚀 5. Start the Server
+// 🚀 6. Start the Server
 // ---------------------------------------------
 const PORT = process.env.PORT || 5001;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

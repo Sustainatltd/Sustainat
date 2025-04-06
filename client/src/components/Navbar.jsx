@@ -6,10 +6,11 @@ import { Link, useNavigate } from 'react-router-dom';
 function Navbar() {
   const navigate = useNavigate(); // 🎯 Used to navigate when logging out
 
-  // ✅ Check if the user is logged in by reading from browser storage
+  // ✅ Get whether the user is logged in and is admin from localStorage
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
-  // ✅ Try to get the user’s info (like name) from localStorage safely
+  // ✅ Try to safely get the logged-in user’s info
   let user = {};
   try {
     const storedUser = localStorage.getItem('user');
@@ -19,17 +20,17 @@ function Navbar() {
     user = {};
   }
 
-  // ✅ Handle logout — clears the saved data and sends user to login page
+  // ✅ Handle logout — clears saved data and sends user to login
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
   };
 
-  // 🔽 Track if the "Employment" dropdown is open
+  // 🔽 Dropdown menu for "Employment"
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null); // 📦 Used to close dropdown when clicking outside
+  const dropdownRef = useRef(null);
 
-  // 🧼 Closes dropdown if you click anywhere outside of it
+  // 🔁 Close dropdown when clicking outside of it
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -37,10 +38,7 @@ function Navbar() {
       }
     }
 
-    // ✅ Add listener when component mounts
     document.addEventListener('mousedown', handleClickOutside);
-
-    // ❌ Remove it when component unmounts
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -48,23 +46,23 @@ function Navbar() {
 
   return (
     <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-      {/* 🌍 Logo and text — clicking takes you to home */}
+      {/* 🌍 Logo on the left */}
       <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/')}>
         <img src="/images/logo.png" alt="Sustainat Logo" className="h-10 w-10" />
         <span className="text-2xl font-bold text-green-700">Sustainat</span>
       </div>
 
-      {/* 🧭 All page links */}
+      {/* 🧭 Page links */}
       <div className="flex items-center space-x-6">
         <Link to="/" className="hover:text-green-700 transition">Home</Link>
         <Link to="/products" className="hover:text-green-700 transition">Products</Link>
 
-        {/* 🔐 Show Knowledge only if logged in */}
+        {/* 📚 Show Knowledge only if logged in */}
         {isLoggedIn && (
           <Link to="/knowledge" className="hover:text-green-700 transition">Knowledge</Link>
         )}
 
-        {/* 🔽 Employment dropdown menu (only if logged in) */}
+        {/* 🔽 Employment dropdown (only if logged in) */}
         {isLoggedIn && (
           <div className="relative" ref={dropdownRef}>
             <button
@@ -73,8 +71,6 @@ function Navbar() {
             >
               Employment ⌄
             </button>
-
-            {/* 📂 Dropdown items appear when open */}
             {isDropdownOpen && (
               <div className="absolute left-0 mt-2 w-56 bg-white border rounded-md shadow-md z-10">
                 <Link
@@ -84,7 +80,7 @@ function Navbar() {
                   Job Seekers
                 </Link>
                 <Link
-                  to="/employment" // ✅ This is the Sustainat Employment Portal
+                  to="/employment"
                   className="block px-4 py-2 hover:bg-green-100"
                 >
                   Employers/Organisations
@@ -94,15 +90,23 @@ function Navbar() {
           </div>
         )}
 
-        {/* 🔐 Show Network only if logged in */}
+        {/* 🧑‍🤝‍🧑 Network for logged-in users */}
         {isLoggedIn && (
           <Link to="/network" className="hover:text-green-700 transition">Network</Link>
         )}
 
+        {/* 📊 Admin Orders - Only for admin */}
+        {isLoggedIn && isAdmin && (
+          <Link to="/admin-orders" className="hover:text-blue-600 transition font-semibold">
+            📊 Admin Orders
+          </Link>
+        )}
+
+        {/* 📗 Accounting and 📬 Contact - Always visible */}
         <Link to="/accounting" className="hover:text-green-700 transition">Accounting</Link>
         <Link to="/contact" className="hover:text-green-700 transition">Contact</Link>
 
-        {/* 👤 If not logged in, show login/register */}
+        {/* 🔐 Login/Register - Only if not logged in */}
         {!isLoggedIn && (
           <>
             <Link to="/login" className="hover:text-green-700 transition">Login</Link>
@@ -110,7 +114,7 @@ function Navbar() {
           </>
         )}
 
-        {/* 👋 If logged in, show user name and logout */}
+        {/* 👤 Logged-in user section with name + logout */}
         {isLoggedIn && (
           <div className="flex items-center space-x-3">
             <span className="text-sm">👤 {user?.name || 'User'}</span>

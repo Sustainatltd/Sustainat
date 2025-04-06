@@ -1,91 +1,99 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'; // 🧠 React hooks
+import axios from 'axios';                          // 📦 Makes HTTP requests
+import { useNavigate } from 'react-router-dom';     // 🧭 Page navigation
 
-// Individual Product Card component
-function ProductCard({ title, price, originalPrice, rating, description, image, sale }) {
+const Products = () => {
+  const [products, setProducts] = useState([]);     // 📦 Product list
+  const [loading, setLoading] = useState(true);     // ⏳ Loading spinner
+  const [error, setError] = useState(null);         // ❌ Error if fetch fails
+  const navigate = useNavigate();                   // 🧭 Navigate pages
+
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // 🔐 Check login
+
+  // 🎯 Load products from backend
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/products');
+      console.log('✅ Products fetched:', response.data);
+      setProducts(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error('❌ Error fetching products:', err);
+      setError('Something went wrong while fetching products.');
+      setLoading(false);
+    }
+  };
+
+  // 🚀 Run once when the page loads
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // 📦 Save selected product and go to detail view
+  const viewProduct = (product) => {
+    localStorage.setItem('selectedProduct', JSON.stringify(product));
+    navigate('/product');
+  };
+
+  // 📜 Go to "My Orders"
+  const goToMyOrders = () => {
+    navigate('/my-orders');
+  };
+
   return (
-    <div style={{
-      border: '1px solid #ccc',
-      borderRadius: '10px',
-      padding: '15px',
-      width: '280px',
-      margin: '10px',
-      position: 'relative',
-      boxShadow: '2px 2px 10px rgba(0,0,0,0.1)'
-    }}>
-      {/* Show SALE tag if available */}
-      {sale && (
-        <div style={{
-          position: 'absolute',
-          top: '10px',
-          left: '10px',
-          backgroundColor: 'red',
-          color: 'white',
-          padding: '2px 8px',
-          fontWeight: 'bold',
-          fontSize: '12px',
-          borderRadius: '5px'
-        }}>
-          Sale!
+    <div className="p-4 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center">🌍 Sustainat Products</h1>
+
+      {/* 🧾 Show "My Orders" only if logged in */}
+      {isLoggedIn && (
+        <div className="text-center mb-6">
+          <button
+            onClick={goToMyOrders}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow"
+          >
+            📜 View My Orders
+          </button>
         </div>
       )}
 
-      {/* Product Image */}
-      <img src={image} alt={title} style={{ width: '100%', borderRadius: '8px' }} />
+      {/* ⏳ Show while loading */}
+      {loading && <p className="text-center">Loading products...</p>}
 
-      {/* Product Title */}
-      <h3 style={{ marginTop: '10px' }}>{title}</h3>
+      {/* ❌ Show error message */}
+      {error && <p className="text-red-500 text-center">{error}</p>}
 
-      {/* Prices */}
-      <p>
-        {originalPrice && <span style={{ textDecoration: 'line-through', marginRight: '10px' }}>£{originalPrice}</span>}
-        <strong>£{price}</strong>
-      </p>
+      {/* 🛍️ Show all product cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {!loading && products.length === 0 && (
+          <p className="col-span-full text-center">No products available yet.</p>
+        )}
 
-      {/* Star Rating (★ = 1 star) */}
-      <p style={{ color: 'gold' }}>{'★'.repeat(rating)}</p>
-
-      {/* Short description */}
-      <p style={{ fontSize: '14px', color: '#444' }}>{description}</p>
-
-      {/* Buttons */}
-      <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
-        <button style={{ backgroundColor: 'purple', color: 'white', padding: '5px 10px', borderRadius: '5px' }}>Buy Now</button>
-        <button style={{ backgroundColor: 'white', color: 'purple', padding: '5px 10px', border: '1px solid purple', borderRadius: '5px' }}>View</button>
+        {products.map((product) => (
+          <div
+            key={product._id}
+            className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition"
+          >
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-48 object-cover"
+            />
+            <div className="p-4">
+              <h2 className="text-xl font-semibold">{product.name}</h2>
+              <p className="text-sm text-gray-600 mb-2">{product.description}</p>
+              <p className="text-green-700 font-bold mb-4">£{product.price}</p>
+              <button
+                onClick={() => viewProduct(product)}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              >
+                View ➤
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
-}
-
-// Main Products Page
-function Products() {
-  return (
-    <div style={{ padding: '30px', fontFamily: 'Arial' }}>
-      <h1 style={{ color: 'green', marginBottom: '20px' }}>Sustainat Products to reduce CO₂</h1>
-
-      {/* Products Grid */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around' }}>
-        {/* Product 1: Business Card */}
-        <ProductCard
-          title="Sustainable Contactless Business Card"
-          price="25.00"
-          rating={5}
-          description="We are committed to providing innovative solutions for sustainable business practices..."
-          image="https://i.imgur.com/Q4V1lNH.jpeg"
-        />
-
-        {/* Product 2: Bamboo Tooth Brush (on sale) */}
-        <ProductCard
-          title="Sustainable Tooth Brush"
-          price="2.50"
-          originalPrice="3.00"
-          rating={5}
-          sale={true}
-          description="Introducing Sustainat's Eco-Friendly Wooden Toothbrush - a sustainable dental care choice..."
-          image="https://i.imgur.com/NwYOZ5W.jpeg"
-        />
-      </div>
-    </div>
-  );
-}
+};
 
 export default Products;

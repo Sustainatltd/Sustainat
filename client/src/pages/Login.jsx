@@ -19,37 +19,48 @@ function Login() {
     e.preventDefault(); // ❌ Don't let the page refresh
 
     try {
-      // 🧠 We're sending login info to the backend
+      // 🧠 Send login info to backend
       const response = await fetch('http://localhost:5001/api/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json' // 📦 We're sending JSON data
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password }) // 📤 Send email + password
       });
 
-      const data = await response.json(); // 📥 Convert the response into usable data
+      const data = await response.json(); // 📥 Convert backend reply to JSON
 
-      if (response.ok) {
-        // ✅ Login worked!
+      if (response.ok && data.token) {
+        // ✅ Login success!
         setMessage('✅ Login successful!');
 
-        // 💾 Save user info in browser memory
+        // 💾 Save the JWT token (very important for protected routes)
+        localStorage.setItem('token', data.token);
+
+        // 💾 Save user info & logged-in flag
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('isLoggedIn', 'true');
 
-        // 💼 If email is an HR email, save it for HR dashboard
+        // ✅ If this is the admin, give special powers!
+        if (data.user?.email === 'sumanth@sustainat.co.uk') {
+          localStorage.setItem('isAdmin', 'true');
+        } else {
+          localStorage.setItem('isAdmin', 'false');
+        }
+
+        // 💼 Optional HR role support
         if (data.user?.email && data.user.email.includes('hr@')) {
           localStorage.setItem('hrEmail', data.user.email);
         }
 
-        navigate('/'); // 🏃‍♂️ Go to home page
+        // 🏠 Go to homepage
+        navigate('/');
       } else {
-        // ❌ Login failed, show the message
-        setMessage(`❌ ${data.message}`);
+        // ❌ Show backend error (e.g., wrong password)
+        setMessage(`❌ ${data.message || 'Login failed'}`);
       }
     } catch (err) {
-      // ❌ Something went wrong with the request
+      // ❌ Catch network or other errors
       console.error('❌ Login error:', err);
       setMessage('❌ Something went wrong while logging in');
     }
@@ -94,9 +105,7 @@ function Login() {
   );
 }
 
-// -------------------------------------------
 // ✨ Style for input fields
-// -------------------------------------------
 const inputStyle = {
   display: 'block',
   width: '100%',
@@ -105,9 +114,7 @@ const inputStyle = {
   fontSize: '16px'
 };
 
-// -------------------------------------------
 // ✨ Style for Login button
-// -------------------------------------------
 const submitBtn = {
   backgroundColor: 'green',
   color: 'white',
@@ -118,5 +125,5 @@ const submitBtn = {
   cursor: 'pointer'
 };
 
-// 📤 Export this component so App.js can use it
+// 📤 Export for use in App.js
 export default Login;

@@ -6,28 +6,34 @@ const mongoose = require('mongoose');
 
 // 🧱 Define schema for each user
 const userSchema = new mongoose.Schema({
-  // 👤 Full Name (required)
+  // 👤 Full Name
   name: {
     type: String,
     required: true
   },
 
-  // 📧 Email (required + must be unique)
+  // 📧 Email (must be unique)
   email: {
     type: String,
     required: true,
-    unique: true // Prevents duplicate emails
+    unique: true
   },
 
-  // 🔐 Hashed password (required)
+  // 🔐 Hashed password
   password: {
     type: String,
     required: true
+  },
+
+  // 🛡️ NEW: Is this user an admin?
+  isAdmin: {
+    type: Boolean,
+    default: false // 🧍 Normal users are not admins by default
   }
 
 }, {
-  timestamps: true // ⏱ Adds createdAt and updatedAt fields automatically
+  timestamps: true // ⏱ Adds createdAt and updatedAt fields
 });
 
-// 🛠 Export the model for use in controllers
+// 🛠 Export the model
 module.exports = mongoose.model('User', userSchema);

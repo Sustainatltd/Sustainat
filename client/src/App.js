@@ -1,12 +1,13 @@
-// ✅ React Router DOM components for navigation
+// ✅ React Router DOM for navigation
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// ✅ Reusable navigation bar
+// ✅ Reusable top navigation
 import Navbar from './components/Navbar';
 
-// ✅ All main page components
+// ✅ Main page components
 import Home from './pages/Home';
 import Products from './pages/Products';
+import ProductDetail from './pages/ProductDetail'; // 👈 Product detail view
 import Knowledge from './pages/Knowledge';
 import Employment from './pages/Employment';
 import Accounting from './pages/Accounting';
@@ -15,27 +16,28 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Applications from './pages/Applications';
+import MyOrders from './pages/MyOrders'; // ✅ View your orders
+import AdminProducts from './pages/AdminProducts'; // 👑 Admin-only product manager
 
-// ✅ Topic pages under "Knowledge"
+// ✅ Knowledge topic pages
 import ClimateChange from './pages/ClimateChange';
 import SustainableTech from './pages/SustainableTech';
 import ZeroWaste from './pages/ZeroWaste';
 
-// 🔒 This helps protect pages so only logged-in users can see them
+// 🔒 Only allow access if user is logged in
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
-    // 🧭 Wrap the whole app inside the router to enable page navigation
+    // 🧭 Enable routing across the whole app
     <Router>
-      {/* 🌍 Always show the navbar at the top */}
+      {/* 🌍 Navbar shows on every page */}
       <Navbar />
 
-      {/* 📦 This is where page content changes based on the URL */}
+      {/* 🧩 Page content area */}
       <div className="p-8 font-sans">
         <Routes>
-
-          {/* 🌐 Public Pages (everyone can see) */}
+          {/* 🌐 Public Pages (no login needed) */}
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/knowledge" element={<Knowledge />} />
@@ -44,12 +46,20 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* 📚 Knowledge Subpages (extra topic pages) */}
+          {/* 📚 Knowledge topic subpages */}
           <Route path="/climate-change" element={<ClimateChange />} />
           <Route path="/sustainable-tech" element={<SustainableTech />} />
           <Route path="/zero-waste" element={<ZeroWaste />} />
 
-          {/* 🔐 Protected Pages (must be logged in to see) */}
+          {/* 🔒 Protected Pages (login required) */}
+          <Route
+            path="/product"
+            element={
+              <ProtectedRoute>
+                <ProductDetail />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/employment"
             element={
@@ -71,6 +81,24 @@ function App() {
             element={
               <ProtectedRoute>
                 <Network />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              <ProtectedRoute>
+                <MyOrders />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 👑 Admin Page: manage products */}
+          <Route
+            path="/admin-products"
+            element={
+              <ProtectedRoute>
+                <AdminProducts />
               </ProtectedRoute>
             }
           />
