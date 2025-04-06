@@ -12,3 +12,5 @@ dist/
 # 🐳 Ignore Docker local files (optional)
 *.local
 docker-compose.override.yml
+cloudinary-secret.yaml
+k8s/mongo-secret.yaml

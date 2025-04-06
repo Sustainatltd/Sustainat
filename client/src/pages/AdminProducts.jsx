@@ -1,35 +1,26 @@
-// AdminProducts.jsx
-import React, { useEffect, useState } from 'react'; // React hooks
-import axios from 'axios'; // For making HTTP requests
+// ✅ Import React and helpers
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import ImageUploader from '../components/ImageUploader'; // 📷 Import our new ImageUploader component
 
 const AdminProducts = () => {
-  // 🧠 Storing products from the database
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // 📦 Products list
+  const [form, setForm] = useState({ name: '', description: '', price: '', image: '' }); // 📝 Form fields
+  const [editId, setEditId] = useState(null); // ✏️ ID of product being edited
+  const [loading, setLoading] = useState(true); // ⏳ Loading state
+  const [error, setError] = useState(null); // ❌ Error state
 
-  // 📝 This stores what we type into the form
-  const [form, setForm] = useState({ name: '', description: '', price: '', image: '' });
+  const token = localStorage.getItem('token'); // 🔑 Auth token
+  const isAdmin = localStorage.getItem('isAdmin') === 'true'; // 🛡️ Admin check
 
-  // 🛠️ This remembers if we are editing a product
-  const [editId, setEditId] = useState(null);
-
-  // ⏳ Show loading text while we wait for data
-  const [loading, setLoading] = useState(true);
-
-  // ❌ For showing error messages
-  const [error, setError] = useState(null);
-
-  // 🪪 Get token and admin flag from localStorage
-  const token = localStorage.getItem('token');
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
-
-  // 📦 Get all products from the backend
+  // 📡 Fetch products on mount if admin
   useEffect(() => {
     if (!isAdmin) return;
 
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:5001/api/products');
-        setProducts(res.data); // ✅ Save products to show
+        const res = await axios.get('/api/products');
+        setProducts(res.data);
         setLoading(false);
       } catch (err) {
         console.error('❌ Error fetching products:', err.response?.data || err.message);
@@ -41,7 +32,7 @@ const AdminProducts = () => {
     fetchProducts();
   }, [isAdmin]);
 
-  // 🚫 Stop non-admins from seeing the page
+  // 🛑 Block access for non-admins
   if (!isAdmin) {
     return (
       <div className="text-center mt-10 text-red-600 font-semibold">
@@ -50,12 +41,12 @@ const AdminProducts = () => {
     );
   }
 
-  // ⌨️ When the form inputs change, update the form state
+  // ⌨️ Handle form input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Add or update a product
+  // 📤 Handle form submit to add/edit product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,35 +57,21 @@ const AdminProducts = () => {
         },
       };
 
-      // Convert price to a number
       const productData = {
         ...form,
         price: parseFloat(form.price),
       };
 
       let res;
-
       if (editId) {
-        // ✏️ Edit mode - update the product
-        res = await axios.patch(
-          `http://localhost:5001/api/products/${editId}`,
-          productData,
-          config
-        );
-        // Replace the old product in the list with updated one
+        res = await axios.patch(`/api/products/${editId}`, productData, config);
         setProducts(products.map((p) => (p._id === editId ? res.data : p)));
-        setEditId(null); // Exit edit mode
+        setEditId(null);
       } else {
-        // ➕ Add mode - create a new product
-        res = await axios.post(
-          'http://localhost:5001/api/products',
-          productData,
-          config
-        );
-        setProducts([...products, res.data]); // Add the new product to the list
+        res = await axios.post('/api/products', productData, config);
+        setProducts([...products, res.data]);
       }
 
-      // 🧼 Clear the form
       setForm({ name: '', description: '', price: '', image: '' });
     } catch (err) {
       console.error('❌ Error saving product:', err.response?.data || err.message);
@@ -108,13 +85,10 @@ const AdminProducts = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5001/api/products/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.delete(`/api/products/${productId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Remove the deleted product from the list
       setProducts(products.filter((p) => p._id !== productId));
     } catch (err) {
       console.error('❌ Error deleting product:', err.response?.data || err.message);
@@ -122,7 +96,7 @@ const AdminProducts = () => {
     }
   };
 
-  // ✏️ Fill the form with product data to edit it
+  // ✏️ Start editing a product
   const handleEdit = (product) => {
     setForm({
       name: product.name,
@@ -130,23 +104,18 @@ const AdminProducts = () => {
       price: product.price,
       image: product.image,
     });
-    setEditId(product._id); // Remember which product we're editing
+    setEditId(product._id);
   };
 
   return (
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-3xl font-bold text-center mb-6">🛠️ Admin Product Manager</h1>
 
-      {/* ➕ or ✏️ Form to add/edit a product */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-4 rounded shadow mb-6 space-y-3"
-      >
+      <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mb-6 space-y-3">
         <h2 className="text-xl font-semibold">
           {editId ? '✏️ Edit Product' : '➕ Add New Product'}
         </h2>
 
-        {/* Form fields */}
         <input
           type="text"
           name="name"
@@ -156,6 +125,7 @@ const AdminProducts = () => {
           required
           className="w-full border p-2 rounded"
         />
+
         <input
           type="text"
           name="description"
@@ -165,6 +135,7 @@ const AdminProducts = () => {
           required
           className="w-full border p-2 rounded"
         />
+
         <input
           type="number"
           step="0.01"
@@ -175,6 +146,7 @@ const AdminProducts = () => {
           required
           className="w-full border p-2 rounded"
         />
+
         <input
           type="text"
           name="image"
@@ -185,7 +157,9 @@ const AdminProducts = () => {
           className="w-full border p-2 rounded"
         />
 
-        {/* Submit and cancel buttons */}
+        {/* 📷 Image uploader that auto-fills the image field */}
+        <ImageUploader onUpload={(url) => setForm({ ...form, image: url })} />
+
         <button
           type="submit"
           className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
@@ -207,11 +181,9 @@ const AdminProducts = () => {
         )}
       </form>
 
-      {/* ⏳ Show while loading */}
       {loading && <p className="text-center">Loading products...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      {/* 📦 Show the list of products */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {products.map((product) => (
           <div key={product._id} className="bg-white p-4 rounded shadow">
@@ -224,7 +196,6 @@ const AdminProducts = () => {
             <p className="text-sm text-gray-600">{product.description}</p>
             <p className="font-bold text-green-600 mb-2">£{product.price}</p>
 
-            {/* Edit/Delete buttons */}
             <div className="flex gap-2">
               <button
                 onClick={() => handleEdit(product)}

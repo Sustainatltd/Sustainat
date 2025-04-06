@@ -22,20 +22,42 @@ spec:
     spec:
       containers:
         - name: backend
-          image: sustainatltd/sustainat-backend:latest  # ✅ Use correct Docker Hub image
+          image: sustainatltd/sustainat-backend:latest  # ✅ Pull image from Docker Hub
           imagePullPolicy: Always
           ports:
-            - containerPort: 5001                       # 🚪 Our backend listens on this port
+            - containerPort: 5001                       # 🚪 Expose internal backend port
 
-          # 🌿 Environment variables (Mongo URI + JWT secret)
+          # 🌿 Environment Variables from Kubernetes Secrets
           env:
+            # ✅ MongoDB Atlas URI from mongo-secret
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
                   name: mongo-secret
                   key: uri
+
+            # 🔐 JWT for user auth
             - name: JWT_SECRET
-              value: thisisasecretkey                   # Replace with real secret in production
+              value: thisisasecretkey  # Replace with secure value for production
+
+            # ☁️ Cloudinary credentials from cloudinary-secret
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: cloudinary-secret
+                  key: CLOUDINARY_CLOUD_NAME
+
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudinary-secret
+                  key: CLOUDINARY_API_KEY
+
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cloudinary-secret
+                  key: CLOUDINARY_API_SECRET
 
 ---
 # ----------------------------------------------
@@ -52,6 +74,6 @@ spec:
     app: sustainat-backend
   type: NodePort
   ports:
-    - port: 5001                # Inside the cluster
-      targetPort: 5001          # Inside container
-      nodePort: 30001           # Access from outside via Minikube IP
+    - port: 5001                # 📦 Port exposed inside the cluster
+      targetPort: 5001          # 🎯 Port used inside container
+      nodePort: 30001           # 🌐 Port exposed outside (via Minikube IP)
