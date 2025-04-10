@@ -1,84 +1,93 @@
 // ---------------------------------------------
-// ✅ 1. Imports and Setup
+// ✅ Imports & Initial Setup
 // ---------------------------------------------
-const express = require('express');          // 🛠️ Express helps us build our server
-const cors = require('cors');                // 🌐 Allows frontend to talk to backend (React)
-const client = require('prom-client');       // 📊 Prometheus metrics collection
-require('dotenv').config();                  // 🔒 Load secret keys from .env file
+const express = require('express');
+const cors = require('cors');
+const client = require('prom-client');
+require('dotenv').config(); // 🔒 Load environment variables from .env
 
-const connectDB = require('./config/db');    // 🔌 Connect to MongoDB
-const app = express();                       // 🚀 Initialize our app
+const connectDB = require('./config/db'); // 🍃 MongoDB connection
+const app = express();                    // 🚀 Create Express app
 
 // ---------------------------------------------
-// 🔐 2. Safety Check for JWT Secret
+// 🔐 Secret Check
 // ---------------------------------------------
 if (!process.env.JWT_SECRET) {
-  console.error('❌ Missing JWT_SECRET in your .env file!');
-  process.exit(1); // ❌ Stop the server from running if secret is missing
+  console.error('❌ JWT_SECRET is missing in .env');
+  process.exit(1);
 }
 
 // ---------------------------------------------
-// 🧠 3. Middleware Setup
+// ⚙️ Middleware Setup
 // ---------------------------------------------
-app.use(express.json()); // 📦 Parse JSON in request body
-app.use(cors());         // 🌐 Allow cross-origin requests (e.g., from frontend)
+app.use(express.json()); // 🧠 Allow JSON body parsing
+
+// 🌍 CORS configuration — allow all methods + headers
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// ⚙️ Handle preflight CORS (OPTIONS) requests globally
+app.options('*', cors()); // ✅ Needed for Ingress to forward PATCH/DELETE safely
 
 // ---------------------------------------------
-// 📈 4. Prometheus Monitoring Route
+// 📈 Prometheus Metrics
 // ---------------------------------------------
-const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics(); // 🧪 Start collecting system metrics
+client.collectDefaultMetrics(); // 📊 Collect default system metrics
 
 app.get('/metrics', async (req, res) => {
   try {
     res.set('Content-Type', client.register.contentType);
     res.end(await client.register.metrics());
   } catch (err) {
+    console.error('❌ Metrics error:', err);
     res.status(500).end(err);
   }
 });
 
 // ---------------------------------------------
-// 🍃 5. Connect to MongoDB Atlas or Local
+// 🍃 Connect MongoDB
 // ---------------------------------------------
-connectDB(); // ✅ Establish DB connection using MONGO_URI
+connectDB(); // 🔌 Establish DB connection
 
 // ---------------------------------------------
-// 🚏 6. API Routes
+// 🛣️ API Routes
 // ---------------------------------------------
-
-// 🏠 Home route - just to check if server is up
 app.get('/', (req, res) => {
-  console.log("Home route accessed"); // 🧠 For debugging
+  console.log('🏠 Home route accessed');
   res.send('✅ Sustainat Backend is running');
 });
 
-// 📤 Image Upload Route (NEW) - for Cloudinary
-app.use('/api/upload', require('./routes/uploadRoutes'));
+// 👤 User Management
+app.use('/api/users', require('./routes/userRoutes'));
 
-// 👤 User Authentication Routes
+// 🔐 Auth (login/register)
 app.use('/api', require('./routes/authRoutes'));
 
-// 💼 Jobs - Post and View Job Listings
+// ☁️ Cloudinary Uploads
+app.use('/api/upload', require('./routes/uploadRoutes'));
+
+// 💼 Jobs
 app.use('/api', require('./routes/jobRoutes'));
 
-// 📩 Job Applications - Send and Track
+// 📩 Job Applications
 app.use('/api', require('./routes/applicationRoutes'));
 
-// 🛍️ Products - Admin can manage products
+// 🛍️ Products
 app.use('/api/products', (req, res, next) => {
-  console.log(`Product route accessed: ${req.method} ${req.originalUrl}`); // 🧠 For debugging
+  console.log(`🛍️ Product route hit: ${req.method} ${req.originalUrl}`);
   next();
 }, require('./routes/productRoutes'));
 
-// 📦 Orders - User checkout and order history
+// 📦 Orders
 app.use('/api/orders', require('./routes/orderRoutes'));
 
 // ---------------------------------------------
-// 🚀 7. Start the Server
+// 🚀 Start Server
 // ---------------------------------------------
 const PORT = process.env.PORT || 5001;
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Sustainat backend running on port ${PORT}`);
 });

@@ -1,47 +1,51 @@
-const jwt = require('jsonwebtoken'); // 📦 To read tokens
-const User = require('../models/User'); // 👤 To fetch users from MongoDB
+// ---------------------------------------------
+// 🔐 requireAuth.js — Verifies JWT & Attaches User Info
+// ---------------------------------------------
+
+const jwt = require('jsonwebtoken');          // 📦 For decoding tokens
+const User = require('../models/User');       // 👤 User model to fetch user from DB
 
 const requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
 
+  // 🚫 1. Block if there's no token at all
   if (!authorization) {
-    console.log('❌ No token provided');
+    console.log('❌ No Authorization header found');
     return res.status(401).json({ error: '🚫 No token provided' });
   }
 
   try {
-    // 🪪 Remove "Bearer " from the beginning if present
+    // 🔐 2. Extract token from header — remove "Bearer " if present
     const token = authorization.startsWith('Bearer ')
       ? authorization.split(' ')[1]
       : authorization;
 
-    console.log('Token received in backend:', token);
+    console.log('🔍 Token received:', token);
 
-    // ✅ Decode the token using the secret key
+    // ✅ 3. Decode and verify the token using secret key
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 🧠 GET the correct field — "_id", not "id"
-    const userId = decoded._id;
-    console.log('✅ Decoded user ID:', userId);
+    // 🔎 4. Use decoded token to fetch user from DB
+    const user = await User.findById(decoded._id).select('_id email isAdmin');
 
-    // 🔍 Find user in DB using the ID we got from the token
-    const user = await User.findById(userId).select('_id email');
-
+    // 🛑 5. If user is not found in DB
     if (!user) {
-      console.log(`❌ User with ID ${userId} not found`);
+      console.log(`❌ User with ID ${decoded._id} not found in database`);
       return res.status(404).json({ error: '❌ User not found' });
     }
 
-    // 🧵 Attach the user info to the request so routes can use it
+    // 🧠 6. Attach user info to request object
     req.user = {
-      _id: user._id.toString(),
-      email: user.email,
+      _id: user._id.toString(),     // 🆔 User ID
+      email: user.email,            // 📧 Email
+      isAdmin: user.isAdmin         // 🛡️ Admin status (used in admin-only routes)
     };
 
-    console.log(`✅ User authenticated: ${req.user.email}`);
-    next(); // 🎯 Continue to the next step
-  } catch (error) {
-    console.error('❌ Token error:', error.message);
+    console.log(`✅ Authenticated: ${user.email} | Admin: ${user.isAdmin}`);
+    next(); // ✅ Go to next middleware or route handler
+
+  } catch (err) {
+    console.error('❌ Token verification failed:', err.message);
     return res.status(401).json({ error: '🚫 Token invalid or expired' });
   }
 };

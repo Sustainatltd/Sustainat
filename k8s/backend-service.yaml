@@ -14,7 +14,8 @@ spec:
   selector:
     app: sustainat-backend          # 🎯 This selects the pod with the same label (defined in deployment)
 
-  ports:
-    - port: 5001                    # 📡 Port inside the Kubernetes cluster
-      targetPort: 5001              # 🎯 Port where the app (Node.js server) is running inside the pod
-      nodePort: 30001               # 🌍 Port exposed to your laptop: http://localhost:30001/
+ ports:
+  - name: http                     # ✅ Important: helps Ingress identify this port
+    port: 5001                    # 📡 Port exposed inside the Kubernetes cluster
+    targetPort: 5001             # 🎯 Internal app port in the container
+    nodePort: 30001              # 🌍 External access via Minikube: http://localhost:30001/

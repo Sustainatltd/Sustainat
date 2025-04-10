@@ -3,6 +3,12 @@ kind: Ingress
 metadata:
   name: sustainat-ingress
   namespace: sustainat
+  annotations:
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-max-age: "86400"
 spec:
   rules:
     - host: 127.0.0.1.nip.io

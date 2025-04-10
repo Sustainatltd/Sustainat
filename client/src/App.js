@@ -18,6 +18,7 @@ import Register from './pages/Register';
 import Applications from './pages/Applications';
 import MyOrders from './pages/MyOrders'; // ✅ View your orders
 import AdminProducts from './pages/AdminProducts'; // 👑 Admin-only product manager
+import AdminUsers from './pages/AdminUsers'; // ✅ NEW: View all users (admin panel)
 
 // ✅ Knowledge topic pages
 import ClimateChange from './pages/ClimateChange';
@@ -93,12 +94,22 @@ function App() {
             }
           />
 
-          {/* 👑 Admin Page: manage products */}
+          {/* 👑 Admin Page: Manage Products */}
           <Route
             path="/admin-products"
             element={
               <ProtectedRoute>
                 <AdminProducts />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 👥 Admin Page: View All Users (NEW) */}
+          <Route
+            path="/admin-users"
+            element={
+              <ProtectedRoute>
+                <AdminUsers />
               </ProtectedRoute>
             }
           />
