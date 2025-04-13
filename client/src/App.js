@@ -1,44 +1,51 @@
-// ✅ React Router DOM for navigation
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// ✅ Reusable top navigation
-import Navbar from './components/Navbar';
+// Importing necessary components (Navbar, Footer, Pages)
+import Navbar from './components/Navbar';  // The top navigation bar
+import Footer from './components/Footer';  // Footer component to show at the bottom of the page
 
-// ✅ Main page components
-import Home from './pages/Home';
-import Products from './pages/Products';
-import ProductDetail from './pages/ProductDetail'; // 👈 Product detail view
-import Knowledge from './pages/Knowledge';
-import Employment from './pages/Employment';
-import Accounting from './pages/Accounting';
-import Network from './pages/Network';
-import Contact from './pages/Contact';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Applications from './pages/Applications';
-import MyOrders from './pages/MyOrders'; // ✅ View your orders
-import AdminProducts from './pages/AdminProducts'; // 👑 Admin-only product manager
-import AdminUsers from './pages/AdminUsers'; // ✅ NEW: View all users (admin panel)
+// Importing other pages and components
+import Home from './pages/Home';  // Home page component
+import Products from './pages/Products';  // Products page component
+import ProductDetail from './pages/ProductDetail';  // Product detail page component
+import Knowledge from './pages/Knowledge';  // Knowledge page component
+import Employment from './pages/Employment';  // Employment page component
+import Accounting from './pages/Accounting';  // Accounting page component
+import Network from './pages/Network';  // Network page component
+import Contact from './pages/Contact';  // Contact page component
+import Login from './pages/Login';  // Login page component
+import Register from './pages/Register';  // Register page component
+import Applications from './pages/Applications';  // Applications page component
+import MyOrders from './pages/MyOrders';  // My Orders page component
+import AdminProducts from './pages/AdminProducts';  // Admin Products page component
+import AdminUsers from './pages/AdminUsers';  // Admin Users page component
 
-// ✅ Knowledge topic pages
-import ClimateChange from './pages/ClimateChange';
-import SustainableTech from './pages/SustainableTech';
-import ZeroWaste from './pages/ZeroWaste';
+// Knowledge pages for specific topics
+import ClimateChange from './pages/ClimateChange';  // Climate Change page
+import SustainableTech from './pages/SustainableTech';  // Sustainable Tech page
+import ZeroWaste from './pages/ZeroWaste';  // Zero Waste page
 
-// 🔒 Only allow access if user is logged in
-import ProtectedRoute from './components/ProtectedRoute';
+// Importing Privacy Policy and About pages
+import PrivacyPolicy from './pages/PrivacyPolicy';  // Privacy Policy page component
+import About from './pages/About';  // About page component
+
+// Importing the ProtectedRoute component for protecting certain routes
+import ProtectedRoute from './components/ProtectedRoute';  // Protects routes to ensure only logged-in users can access them
+import SearchResults from './pages/SearchResults';  // Search Results page for showing search results
 
 function App() {
   return (
-    // 🧭 Enable routing across the whole app
+    // The Router component manages routing between pages
     <Router>
-      {/* 🌍 Navbar shows on every page */}
+      {/* Navbar - The top navigation bar that will be present on every page */}
       <Navbar />
 
-      {/* 🧩 Page content area */}
+      {/* Main content area, with some padding */}
       <div className="p-8 font-sans">
+        {/* The Routes component defines all the paths to different pages */}
         <Routes>
-          {/* 🌐 Public Pages (no login needed) */}
+          {/* Public Pages - These are pages that anyone can access, no need to log in */}
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
           <Route path="/knowledge" element={<Knowledge />} />
@@ -47,17 +54,24 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* 📚 Knowledge topic subpages */}
+          {/* Knowledge Pages */}
           <Route path="/climate-change" element={<ClimateChange />} />
           <Route path="/sustainable-tech" element={<SustainableTech />} />
           <Route path="/zero-waste" element={<ZeroWaste />} />
 
-          {/* 🔒 Protected Pages (login required) */}
+          {/* New Pages for Privacy Policy and About */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />  {/* Privacy Policy page */}
+          <Route path="/about" element={<About />} />  {/* About page */}
+
+          {/* Search Results Route */}
+          <Route path="/search/:query" element={<SearchResults />} />
+
+          {/* Protected Pages - These pages require the user to be logged in to access */}
           <Route
-            path="/product"
+            path="/product/:id"
             element={
               <ProtectedRoute>
-                <ProductDetail />
+                <ProductDetail />  {/* Product detail page */}
               </ProtectedRoute>
             }
           />
@@ -65,7 +79,7 @@ function App() {
             path="/employment"
             element={
               <ProtectedRoute>
-                <Employment />
+                <Employment />  {/* Employment page */}
               </ProtectedRoute>
             }
           />
@@ -73,7 +87,7 @@ function App() {
             path="/applications"
             element={
               <ProtectedRoute>
-                <Applications />
+                <Applications />  {/* Applications page */}
               </ProtectedRoute>
             }
           />
@@ -81,7 +95,7 @@ function App() {
             path="/network"
             element={
               <ProtectedRoute>
-                <Network />
+                <Network />  {/* Network page */}
               </ProtectedRoute>
             }
           />
@@ -89,32 +103,33 @@ function App() {
             path="/my-orders"
             element={
               <ProtectedRoute>
-                <MyOrders />
+                <MyOrders />  {/* My Orders page */}
               </ProtectedRoute>
             }
           />
 
-          {/* 👑 Admin Page: Manage Products */}
+          {/* Admin Pages - These pages are only accessible by admins */}
           <Route
             path="/admin-products"
             element={
               <ProtectedRoute>
-                <AdminProducts />
+                <AdminProducts />  {/* Admin product management page */}
               </ProtectedRoute>
             }
           />
-
-          {/* 👥 Admin Page: View All Users (NEW) */}
           <Route
             path="/admin-users"
             element={
               <ProtectedRoute>
-                <AdminUsers />
+                <AdminUsers />  {/* Admin user management page */}
               </ProtectedRoute>
             }
           />
         </Routes>
       </div>
+
+      {/* Footer component to be displayed at the bottom of the page */}
+      <Footer />
     </Router>
   );
 }
