@@ -1,37 +1,48 @@
-const mongoose = require('mongoose'); // 🧠 Mongoose lets us talk to MongoDB using JavaScript
+const mongoose = require('mongoose'); 
+// 🧠 Mongoose = tool to talk to MongoDB in JavaScript
 
 // 📦 Define what an "Order" looks like
 const orderSchema = new mongoose.Schema(
   {
+    // 👤 Person placing the order
     name: {
       type: String,
-      required: true, // 👈 Name is required
+      required: true, // 🚫 Cannot be empty
     },
     address: {
       type: String,
-      required: true, // 🏡 Delivery address is required
+      required: true, // 🏡 Needed to deliver
     },
     phone: {
       type: String,
-      required: true, // ☎️ Contact phone is required
+      required: true, // ☎️ We need to call if issues
+    },
+
+    // 🧺 Product details
+    productId: {
+      type: mongoose.Schema.Types.ObjectId, // 🆔 Exact product id
+      ref: 'Product',                       // 🔗 Link to Product model
     },
     productName: {
       type: String,
-      required: true, // 🧺 The product that was bought
+      required: true, // 👶 Friendly name for display
     },
     productPrice: {
       type: Number,
-      required: true, // 💷 Price at the time of order
+      required: true, // 💷 Price when ordered
     },
+
+    // 🔐 Who ordered
     userId: {
-      type: mongoose.Schema.Types.ObjectId, // 🔐 Link to User (optional)
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: true, // 👶 tie order to user always
     },
   },
   {
-    timestamps: true, // 🕒 Adds createdAt and updatedAt automatically
+    timestamps: true, // 🕒 Auto add createdAt + updatedAt
   }
 );
 
-// 🚀 Export the model so we can use it in routes
+// 🚀 Export model
 module.exports = mongoose.model('Order', orderSchema);

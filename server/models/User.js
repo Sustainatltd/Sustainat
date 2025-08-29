@@ -1,39 +1,44 @@
 // -----------------------------------------
 // ✅ User Model (for registration & login)
+// 👶 Kid comment: This is the "ID card" for each user.
+// It has their name, email, password, and whether they are an admin.
 // -----------------------------------------
 
 const mongoose = require('mongoose');
 
-// 🧱 Define schema for each user
-const userSchema = new mongoose.Schema({
-  // 👤 Full Name
-  name: {
-    type: String,
-    required: true
-  },
+const userSchema = new mongoose.Schema(
+  {
+    // 👤 Full Name of the user
+    name: {
+      type: String,
+      required: true,
+      trim: true, // 🧽 Clean up spaces
+    },
 
-  // 📧 Email (must be unique)
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
+    // 📧 Email must be unique (like a unique ID)
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true, // 🧽 Always store as lowercase
+    },
 
-  // 🔐 Hashed password
-  password: {
-    type: String,
-    required: true
-  },
+    // 🔐 Hashed password (never store plain text!)
+    password: {
+      type: String,
+      required: true,
+    },
 
-  // 🛡️ NEW: Is this user an admin?
-  isAdmin: {
-    type: Boolean,
-    default: false // 🧍 Normal users are not admins by default
+    // 🛡️ Admin flag
+    isAdmin: {
+      type: Boolean,
+      default: false, // 🧍 Everyone is a normal user unless marked admin
+    },
+  },
+  {
+    timestamps: true, // ⏱ Auto-add createdAt & updatedAt
   }
+);
 
-}, {
-  timestamps: true // ⏱ Adds createdAt and updatedAt fields
-});
-
-// 🛠 Export the model
+// 🚀 Export model so we can use it elsewhere
 module.exports = mongoose.model('User', userSchema);

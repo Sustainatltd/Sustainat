@@ -1,0 +1,43 @@
+.
+├── client
+│   ├── deployment.yaml
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── node_modules
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── public
+│   ├── README.md
+│   ├── service.yaml
+│   ├── src
+│   └── tailwind.config.js
+├── deploy-local.sh
+├── docker-compose.yml
+├── k8s
+│   ├── backend-deployment.yaml
+│   ├── backend-service.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
+│   ├── mongo-deployment.yaml
+│   ├── monitoring
+│   └── sustainat-ingress.yaml
+├── package-lock.json
+├── package.json
+├── project-tree.txt
+├── README.md
+└── server
+    ├── config
+    ├── controllers
+    ├── Dockerfile
+    ├── middleware
+    ├── models
+    ├── node_modules
+    ├── package-lock.json
+    ├── package.json
+    ├── repairMissingCreators.js
+    ├── routes
+    ├── server.js
+    └── utils
+
+15 directories, 26 files

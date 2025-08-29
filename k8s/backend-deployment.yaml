@@ -29,18 +29,18 @@ spec:
 
           # 🌿 Environment Variables from Kubernetes Secrets
           env:
-            # ✅ Corrected key name from mongo-secret
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
                   name: mongo-secret
                   key: MONGO_URI
 
-            # 🔐 JWT for user auth
             - name: JWT_SECRET
-              value: thisisasecretkey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: JWT_SECRET
 
-            # ☁️ Cloudinary credentials from cloudinary-secret (fixed lowercase keys)
             - name: CLOUDINARY_CLOUD_NAME
               valueFrom:
                 secretKeyRef:

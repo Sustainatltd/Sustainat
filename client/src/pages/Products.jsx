@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from 'react'; // 🧠 React hooks
-import axios from 'axios';                          // 📦 Makes HTTP requests
-import { useNavigate } from 'react-router-dom';     // 🧭 Page navigation
+// 🛍️ Products Page (cleaned)
+// 👶 Kid comment: This page shows all products. We fetch them once when the page opens.
+// We fixed the React warning by putting the fetch helper in a stable box (useCallback).
+
+import React, { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Products = () => {
-  const [products, setProducts] = useState([]);     // 📦 Product list
-  const [loading, setLoading] = useState(true);     // ⏳ Loading spinner
-  const [error, setError] = useState(null);         // ❌ Error if fetch fails
-  const navigate = useNavigate();                   // 🧭 Navigate pages
+  // 📦 State: list, loading, error
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // 🔐 Check login
+  // 🔐 Check if logged in (to show "My Orders" button)
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
-  // 🎯 Load products from backend
-  const fetchProducts = async () => {
+  // 🌐 API base: read runtime config or fallback to /api
+  // 👶 If we have a note in the window (config.js), use it; else use '/api'
+  const API_BASE = (window.__ENV__ && window.__ENV__.API_BASE) || '/api';
+
+  // 🧰 Stable fetch function (so React won’t warn)
+  const fetchProducts = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/products');
-      console.log('✅ Products fetched:', response.data);
+      const response = await axios.get(`${API_BASE}/products`);
       setProducts(response.data);
       setLoading(false);
     } catch (err) {
@@ -22,17 +31,19 @@ const Products = () => {
       setError('Something went wrong while fetching products.');
       setLoading(false);
     }
-  };
+  }, [API_BASE]); // ✅ Only changes if API_BASE changes
 
-  // 🚀 Run once when the page loads
+  // 🚀 Run once on load (and whenever API_BASE changes)
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]); // ✅ No ESLint warning now
 
-  // 📦 Save selected product and go to detail view
+  // 📦 Save selected product AND navigate with id in URL
   const viewProduct = (product) => {
+    // 👖 Put product in our pocket so detail page can show instantly
     localStorage.setItem('selectedProduct', JSON.stringify(product));
-    navigate('/product');
+    // 🧭 Also go to /product/:id so detail page can fetch by id if pocket is empty
+    navigate(`/product/${product._id}`);
   };
 
   // 📜 Go to "My Orders"
@@ -56,13 +67,13 @@ const Products = () => {
         </div>
       )}
 
-      {/* ⏳ Show while loading */}
+      {/* ⏳ Loading */}
       {loading && <p className="text-center">Loading products...</p>}
 
-      {/* ❌ Show error message */}
+      {/* ❌ Error */}
       {error && <p className="text-red-500 text-center">{error}</p>}
 
-      {/* 🛍️ Show all product cards */}
+      {/* 🛍️ Product cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {!loading && products.length === 0 && (
           <p className="col-span-full text-center">No products available yet.</p>
